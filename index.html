@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tenat</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="jsplumb-master/dist\js/jsplumb.min.js"></script>
+
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="workspace_page.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+    <script src="jquery.blockUI.js">
+    </script>
+    <!-- Script for logging every ajax request  -->
+    <script>
+        $(document).ready(function() {
+            $(document).ajaxStart(function() {
+                console.log('ajax start.');
+                // blockUI code with custom message
+                $.blockUI({
+
+                    // blockUI code with custom 
+                    // message and styling
+                    message: "<div class='loader'></div>",
+                    css: {
+                        color: 'green',
+                        borderColor: 'green',
+                        border: 0
+                    }
+                });
+            });
+
+            $(document).ajaxStop(function() {
+                console.log('ajax stop.');
+            });
+            $(document).ajaxSend(function() {
+                console.log('ajax send.');
+            });
+            $(document).ajaxSuccess(function() {
+                console.log('ajax succss.');
+            });
+            $(document).ajaxComplete(function(event, request, settings) {
+                // debugger;
+                console.log('ajax complete.');
+                $.unblockUI();
+            });
+            $(document).ajaxError(function(event, request, settings) {
+                // debugger;
+                console.log('ajax error.');
+
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <!-- Main container including one row with three columns (nodes toolbox,(workspace, preview), info toolbox) in that -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- First Column: nodes toolbox -->
+            <div class="col-md-2 p-1">
+                <div id="toolbox" class="p-0 justify-content-center" style="overflow: scroll;">
+                    <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="position: sticky; top: 0; z-index: 1;font-size: 12px;">Nodes</p>
+                    <div class="p-1 w-100 text-light bg-info"> Import/Export Data</div>
+                    <div id='Import_Collection' class="control import"><i class="bi bi-file-earmark-zip-fill text-success"></i> Import Collection</div>
+                    <div id='Import_Document' class="control import"><i class="bi bi-file-text-fill mr-0 text-success"></i> Import Document</div>
+                    <div id='Export_File' class="control export"><i class="bi bi-file-earmark-arrow-up-fill mr-0 text-success"></i> Export File</div>
+
+                    <div class="p-1 w-100 text-light bg-info"> Basic Analysis</div>
+                    <div id='Tokenization' class="control basic"><i class="bi bi-funnel-fill text-success"></i> Tokenization</div>
+                    <div id='Stopword_Removal' class="control basic"><i class="bi bi-eraser-fill text-success"></i> STW Removal</div>
+                    <div id='TF-IDF_Weight' class="control basic"><i class="bi bi-table text-success "></i> TF-IDF Weight</div>
+                    <div id='Stemming' class="control basic"><i class="bi bi-snow2 text-success font-weight-bolder pr-2"></i> Stemming</div>
+                    <div id='Doc_Statistics' class="control basic"><i class="fa fa-line-chart text-success font-weight-bolder pr-2"></i> Doc Statistics</div>
+
+                    <div class="p-1 w-100 text-light  bg-info"> Graph Analysis</div>
+                    <div id='Graph_Creation' class="control"><i class="bi bi-diagram-3-fill text-success"></i> Graph Creation</div>
+                    <div id='Graph_Viewer' class="control"><i class="bi bi-easel-fill text-success"></i> Graph Viewer</div>
+
+
+                </div>
+            </div>
+
+            <!-- Second Columns: workspace & preview -->
+            <div class="col-md-8  p-1">
+                <!-- Zoom in/out  buttons -->
+                <div class="text-info  m-0 p-0" style="  position: absolute;top: 16px;left: 10px;z-index: 50;">
+                    <a class="zoom d-block"><i class="fas fa-search-plus"></i></a>
+                    <a class="zoom-out d-block"><i class="fas fa-search-minus"></i></a>
+                    <a class="zoom-init d-block"><i class="fas fa-recycle"></i></a>
+                </div>
+                <!-- Script for zooming actions -->
+                <script>
+                    var zoom = 1;
+
+                    $('.zoom').on('click', function() {
+                        if (zoom <= 1.5) {
+                            zoom += 0.1;
+                            $('.target').css('zoom', zoom);
+                        }
+
+                    });
+                    $('.zoom-init').on('click', function() {
+                        zoom = 1;
+                        $('.target').css('zoom', zoom);
+                    });
+                    $('.zoom-out').on('click', function() {
+                        if (zoom >= 0.5) {
+                            zoom -= 0.1;
+                            $('.target').css('zoom', zoom);
+                        }
+
+                    });
+                </script>
+
+                <!-- workspace -->
+                <div id="workspace" class="zoom box target">
+                    <!-- <div id="control1" class="control" style="left: 50px; top: 50px"><i class="bi bi-file-earmark-arrow-down-fill mr-1 text-success"></i> Import Data</div>
+                        <div id="control2" class="control" style="left: 300px; top: 200px"> <i class="bi bi-file-earmark-arrow-up-fill mr-1 text-success"></i>Export Data</div> -->
+                </div>
+
+
+                <!-- preview -->
+                <div id="preview" class="table-responsive" style="position: relative;overflow:scroll;z-index: 40;">
+                    <h6 class="flex-wrap  m-0 p-1 border-0 text-info align-content-center" style="width:50px;">Data</h6>
+
+
+                    <!-- Basic Table -->
+
+
+
+                    <!-- table -->
+                    <table id="Import_Collection" class="table table-bordered d-none table-hover">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col">Document Name</th>
+                                <th scope="col">Document Text (1th line)</th>
+                                <th scope="col">Document Size (KB)</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+                                <th class="col-1" scope="row">1</th>
+                                <td class="col-4">Mark</td>
+                                <td class="col-5">Otto</td>
+                                <td class="col-2">Otto</td>
+
+                            </tr> -->
+                        </tbody>
+                    </table>
+
+                    <table id="Tokenization" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col">Document Name</th>
+                                <th scope="col"> First 10 Tokens</th>
+                                <th scope="col"> Tokens Count</th>
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+
+
+                    <table id="Stopword_Removal" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Document Name</th>
+                                <th scope="col"> Removed Stopwords</th>
+                                <th scope="col">Stopword Count</th>
+
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+
+                    <!-- Doc Statistics -->
+                    <table id="Doc_Statistics" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Document name</th>
+                                <th scope="col"> Total-words Count</th>
+                                <th scope="col"> Distinct-words Count</th>
+                                <th scope="col"> Stop-words Count</th>
+                                <th scope="col"> Main-words Count</th>
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+
+                    <!-- export file -->
+
+                    <!-- ####################################### -->
+
+
+                    <table id="Import_Document" class="table table-bordered d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col">Document Text</th>
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+            <!-- end of second column -->
+
+            <!-- third column: node info toolbox -->
+            <div class="col-md-2  p-1">
+                <div class="right_toolbox p-0 justify-content-center" id="toolbox" style="overflow: scroll;">
+
+                    <!-- Import Collection -->
+                    <form class="my-form-control d-none import_collection" id="Import_Collection">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Import Collection</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
+                             <p class="d-inline" style="font-size: 22px;;">Run</p></button>
+                        </div>
+
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+                        <!-- Import Collection Form -->
+                        <div class="form-group px-1">
+
+                            <div class="input-group pt-2">
+                                <label class="d-block w-100">Collection Path:</label>
+                                <label class="input-group-btn">
+                                    <span id="file-btn" class="btn btn-outline-info rounded-0">
+                                        <!-- &hellip; -->
+                                        <i class="bi bi-folder-fill" style="font-size: 15px;"></i> <input id="FilUploader" class="FilUploader" type="file"  style="display: none;" accept=".zip">
+                                    </span>
+                                </label>
+                                <input id="text-input" type="text" class="form-control border-left-0 border-info" readonly>
+                            </div>
+                            <script>
+                                $(function() {
+
+                                    // This code will attach `fileselect` event to all file inputs on the page
+                                    $(document).on('change', ':file', function() {
+                                        var input = $(this),
+                                            numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                                            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+                                        input.trigger('fileselect', [numFiles, label]);
+                                    });
+
+
+                                    $(document).ready(function() {
+                                        //below code executes on file input change and append name in text control
+                                        $(':file').on('fileselect', function(event, numFiles, label) {
+
+                                            var input = $(this).parents('.input-group').find(':text'),
+                                                log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+                                            form_id = $(this).closest('form').attr('id');
+                                            // alert(form_id);
+
+                                            source_collection_selector = '#' + form_id.concat(' .meta-data p.source_collection');
+
+                                            if (input.length) {
+                                                input.val(log);
+                                                // $(source_collection_selector).text(input.val());
+                                                // input.addClass('btn-outline-success')
+                                            } else {
+                                                if (log) alert(log);
+                                            }
+
+                                        });
+                                    });
+
+                                    $(".FilUploader").change(function() {
+                                        form_id = $(this).closest('form').attr('id');
+                                        // alert(form_id);
+                                        text_input_selector = '#' + form_id.concat(' #text-input');
+                                        file_btn_selector = '#' + form_id.concat(' #file-btn');
+                                        source_collection_selector = '#' + form_id.concat(' .source_collection');
+                                        state_selector = '#' + form_id.concat(' .state');
+                                        tip_selector = '#' + form_id.concat(' .tip');
+
+                                        var fileExtension = ['zip'];
+                                        if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                                            alert("Only formats are allowed : " + fileExtension.join(', '));
+                                            $(this).val(null);
+                                            $(text_input_selector).removeClass('border-info');
+                                            $(text_input_selector).addClass('border-danger');
+                                            $(file_btn_selector).addClass('btn-outline-danger');
+                                            $(state_selector).text('Created');
+                                            $(tip_selector).text('Select a zip file.');
+
+                                        } else {
+                                            $(text_input_selector).removeClass('border-info');
+                                            $(text_input_selector).removeClass('border-danger');
+                                            $(text_input_selector).addClass('border-success');
+                                            $(file_btn_selector).removeClass('btn-outline-info');
+                                            $(file_btn_selector).removeClass('btn-outline-danger');
+                                            $(file_btn_selector).addClass('btn-outline-success');
+                                            $(state_selector).text('Ready');
+                                            $(tip_selector).text('');
+
+                                            // $(source_collection_selector).text($(text_input_selector).val());
+                                        }
+                                    });
+
+                                });
+                            </script>
+
+                            <!-- <label for="formGroupExampleInput" class="mb-1 mt-2">Input label:</label>
+                            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Example input">
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input label:</label>
+                            <select id="inputState" class="pl-0 form-control">
+                                <option  selected>Choose...</option>
+                                <option>option 1</option>
+                                <option>option 2</option>
+                                <option>option 3</option>
+                              </select>
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input label:</label>
+                            <select id="inputState" class="form-control pl-0 mt-0">
+                                  <option  selected>Choose...</option>
+                                  <option>option 1</option>
+                                  <option>option 2</option>
+                                  <option>option 3</option>
+                                </select> -->
+
+
+
+                            <!-- <div class="form-check mt-2 px-0">
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Chekbox:
+                                  </label>
+                                <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
+                            </div> -->
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip">The input is not set.</p>
+                            </div>
+
+                            <!-- <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Eval Time:</label>
+                                <p class=" mb-1">56s</p>
+                            </div> -->
+
+                        </div>
+                    </form>
+
+                    <!-- Import Document Form -->
+
+
+
+
+                    <!-- Tokenization Form -->
+
+                    <form class="my-form-control d-none w-100 tokenization" id="Tokenization">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Tokenization</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
+                             <p class="d-inline" style="font-size: 22px;;">Run</p></button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Seperator:</label>
+                            <select id="inputState" class="form-control pl-0 mt-0">
+                                  <option  selected>space</option>
+                                  <option>comma</option>
+                                  <option>tab</option>
+                                  <option disabled>special character</option>
+                                </select>
+                            <!-- <div class="form-check mt-2 px-0">
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Chekbox:
+                                  </label>
+                                <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
+                            </div> -->
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection"></p>
+                            </div>
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
+
+                    <!-- Stopword Removal -->
+
+                    <form class="my-form-control d-none w-100 stopword_removal" id="Stopword_Removal">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">STW Removal</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
+                             <p class="d-inline" style="font-size: 22px;;">Run</p></button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
+                            <select id="inputState" class="form-control pl-0 mt-0">
+                                  <option  selected>English</option>
+                                  <option>Persian</option>
+                                </select>
+                            <!-- <div class="form-check mt-2 px-0">
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Chekbox:
+                                  </label>
+                                <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
+                            </div> -->
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection"></p>
+                            </div>
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
+
+                    <!-- Doc Statistics -->
+
+                    <form class="my-form-control d-none w-100 doc_statistics" id="Doc_Statistics">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Doc Statistics</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
+                             <p class="d-inline" style="font-size: 22px;;">Run</p></button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
+                            <select id="inputState" class="form-control pl-0 mt-0">
+                                  <option  selected>English</option>
+                                  <option>Persian</option>
+                                </select>
+                            <!-- <div class="form-check mt-2 px-0">
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Chekbox:
+                                  </label>
+                                <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
+                            </div> -->
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection"></p>
+                            </div>
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
+                    <!-- Export Data Form -->
+
+                    <form class="my-form-control d-none w-100 export_file" id="Export_File">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Export File</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
+                             <p class="d-inline" style="font-size: 22px;;">
+                                    <a>Run</a></p></button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Output Format:</label>
+                            <select id="export_data_output_format" class="pl-0 form-control">
+                                <option  selected>.txt</option>
+                                <option>.docx</option>
+                                <option>.csv</option>
+                              </select>
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection"></p>
+                            </div>
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Scripts for handling jsplumb actions -->
+    <script type="text/javascript" src="jsplumb_handlers.js">
+    </script>
+</body>
+
+</html>
