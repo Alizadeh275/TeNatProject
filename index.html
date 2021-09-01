@@ -225,6 +225,28 @@
                         </tbody>
                     </table>
 
+
+                    <!-- Stemming -->
+                    <table id="Stemming" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Document name</th>
+                                <th scope="col"> Stemmed Word</th>
+                                <th scope="col"> Stemmed Count</th>
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+
+
                     <!-- export file -->
 
                     <!-- ####################################### -->
@@ -546,6 +568,66 @@
                         <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
                             <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
                             <h3 class="bg-light w-100 m-0 p-2">Doc Statistics</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
+                             <p class="d-inline" style="font-size: 22px;;">Run</p></button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
+                            <select id="inputState" class="form-control pl-0 mt-0">
+                                  <option  selected>English</option>
+                                  <option>Persian</option>
+                                </select>
+                            <!-- <div class="form-check mt-2 px-0">
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Chekbox:
+                                  </label>
+                                <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
+                            </div> -->
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection"></p>
+                            </div>
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
+
+
+                    <!-- Stemming -->
+
+                    <form class="my-form-control d-none w-100 stemming" id="Stemming">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Stemming</h3>
                             <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
                              <p class="d-inline" style="font-size: 22px;;">Run</p></button>
                         </div>
