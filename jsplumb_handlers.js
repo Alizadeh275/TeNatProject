@@ -353,6 +353,9 @@
                  } else if (form_class == 'doc_statistics') {
                      $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-2">' + value.distinct + '</td>' + '<td class="col-2">' + value.stop + '</td>' + '<td class="col-2">' + value.main + '</td>' + '</tr>');
 
+                 } else if (form_class == 'stemming') {
+                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
+
                  }
              });
              $(state_selector).text('Completed');
@@ -385,7 +388,7 @@
              $(source_collection_selector).text(file_name);
              formData.append('name', file_name); //این فیلد را می توانی حذف کنی
              formData.append('file', file_uploader.files[0]);
-             url = 'http://localhost:8000/api/import/';
+             url = 'http://tenat.pythonanywhere.com/api/import/';
              // alert(file_uploader[0].files[0]);
              send_request(formData, url, form_id, 'import_collection')
          }
@@ -405,7 +408,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('splitter', ' ');
-         url = 'http://localhost:8000/api/tokenize/';
+         url = 'http://tenat.pythonanywhere.com/api/tokenize/';
          send_request(formData, url, form_id, 'tokenization');
      });
 
@@ -421,7 +424,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('language', language);
-         url = 'http://localhost:8000/api/stop-word-removal/';
+         url = 'http://tenat.pythonanywhere.com/api/stop-word-removal/';
          send_request(formData, url, form_id, 'stopword_removal');
      });
 
@@ -437,10 +440,27 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('language', language);
-         url = 'http://localhost:8000/api/doc-statistics/';
+         url = 'http://tenat.pythonanywhere.com/api/doc-statistics/';
          send_request(formData, url, form_id, 'doc_statistics');
 
      });
+
+     // doc_statistics Run
+     $('form.stemming button').click(function() {
+         var formData = new FormData();
+         form_id = $(this).closest('form').attr('id');
+         file_name = get_file_name(form_id);
+         language = get_language(form_id);
+         source_node = get_source_node(form_id);
+
+         formData.append('name', file_name);
+         formData.append('from', source_node);
+         formData.append('language', language);
+         url = 'http://tenat.pythonanywhere.com/api/stem/';
+         send_request(formData, url, form_id, 'stemming');
+
+     });
+
 
      function download_file(url, form_id, node_class) {
          source_collection_selector = 'form#'.concat(form_id) + ' .meta-data p.source_collection';
@@ -496,13 +516,14 @@
          formData.append('format', '.txt');
          // alert($('#FilUploader')[0].files[0]);
          $.ajax({
-             url: "http://localhost:8000/api/export/",
+             //  url: "http://localhost:8000/api/export/",
+             url: "http://tenat.pythonanywhere.com/api/export/",
              data: formData,
              type: 'POST',
              contentType: false,
              processData: false
          }).done(function(res) {
-             file_src = 'http://localhost:8000/' + res;
+             file_src = 'http://tenat.pythonanywhere.com/' + res;
              download_file(file_src, form_id, source_node);
 
          });
