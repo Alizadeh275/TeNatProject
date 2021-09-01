@@ -388,7 +388,7 @@
              $(source_collection_selector).text(file_name);
              formData.append('name', file_name); //این فیلد را می توانی حذف کنی
              formData.append('file', file_uploader.files[0]);
-             url = 'http://tenat.pythonanywhere.com/api/import/';
+             url = 'https://tenat.pythonanywhere.com/api/import/';
              // alert(file_uploader[0].files[0]);
              send_request(formData, url, form_id, 'import_collection')
          }
@@ -408,7 +408,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('splitter', ' ');
-         url = 'http://tenat.pythonanywhere.com/api/tokenize/';
+         url = 'https://tenat.pythonanywhere.com/api/tokenize/';
          send_request(formData, url, form_id, 'tokenization');
      });
 
@@ -424,7 +424,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('language', language);
-         url = 'http://tenat.pythonanywhere.com/api/stop-word-removal/';
+         url = 'https://tenat.pythonanywhere.com/api/stop-word-removal/';
          send_request(formData, url, form_id, 'stopword_removal');
      });
 
@@ -440,7 +440,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('language', language);
-         url = 'http://tenat.pythonanywhere.com/api/doc-statistics/';
+         url = 'https://tenat.pythonanywhere.com/api/doc-statistics/';
          send_request(formData, url, form_id, 'doc_statistics');
 
      });
@@ -456,7 +456,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('language', language);
-         url = 'http://tenat.pythonanywhere.com/api/stem/';
+         url = 'https://tenat.pythonanywhere.com/api/stem/';
          send_request(formData, url, form_id, 'stemming');
 
      });
@@ -516,14 +516,14 @@
          formData.append('format', '.txt');
          // alert($('#FilUploader')[0].files[0]);
          $.ajax({
-             //  url: "http://localhost:8000/api/export/",
-             url: "http://tenat.pythonanywhere.com/api/export/",
+             //  url: "https://localhost:8000/api/export/",
+             url: "https://tenat.pythonanywhere.com/api/export/",
              data: formData,
              type: 'POST',
              contentType: false,
              processData: false
          }).done(function(res) {
-             file_src = 'http://tenat.pythonanywhere.com/' + res;
+             file_src = 'https://tenat.pythonanywhere.com/' + res;
              download_file(file_src, form_id, source_node);
 
          });
