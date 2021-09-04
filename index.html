@@ -74,20 +74,20 @@
                 <div id="toolbox" class="p-0 justify-content-center" style="overflow: scroll;">
                     <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="position: sticky; top: 0; z-index: 1;font-size: 12px;">Nodes</p>
                     <div class="p-1 w-100 text-light bg-info"> Import/Export Data</div>
-                    <div id='Import_Collection' class="control import"><i class="bi bi-file-earmark-zip-fill text-success"></i> Import Collection</div>
-                    <div id='Import_Document' class="control import"><i class="bi bi-file-text-fill mr-0 text-success"></i> Import Document</div>
-                    <div id='Export_File' class="control export"><i class="bi bi-file-earmark-arrow-up-fill mr-0 text-success"></i> Export File</div>
+                    <div id='Import_Collection' class="control import border-secondary"><i class="bi bi-file-earmark-zip-fill text-secondary"></i> Import Collection</div>
+                    <div id='Import_Document' class="control import border-secondary"><i class="bi bi-file-text-fill mr-0 text-secondary"></i> Import Document</div>
+                    <div id='Export_File' class="control export border-secondary"><i class="bi bi-file-earmark-arrow-up-fill mr-0 text-secondary"></i> Export File</div>
 
                     <div class="p-1 w-100 text-light bg-info"> Basic Analysis</div>
-                    <div id='Tokenization' class="control basic"><i class="bi bi-funnel-fill text-success"></i> Tokenization</div>
-                    <div id='Stopword_Removal' class="control basic"><i class="bi bi-eraser-fill text-success"></i> STW Removal</div>
-                    <div id='TF-IDF_Weight' class="control basic"><i class="bi bi-table text-success "></i> TF-IDF Weight</div>
-                    <div id='Stemming' class="control basic"><i class="bi bi-snow2 text-success font-weight-bolder pr-2"></i> Stemming</div>
-                    <div id='Doc_Statistics' class="control basic"><i class="fa fa-line-chart text-success font-weight-bolder pr-2"></i> Doc Statistics</div>
+                    <div id='Tokenization' class="control basic border-secondary"><i class="bi bi-funnel-fill text-secondary"></i> Tokenization</div>
+                    <div id='Stopword_Removal' class="control basic border-secondary"><i class="bi bi-eraser-fill text-secondary"></i> STW Removal</div>
+                    <div id='TF-IDF_Weight' class="control basic border-secondary"><i class="bi bi-table text-secondary "></i> TF-IDF Weight</div>
+                    <div id='Stemming' class="control basic border-secondary"><i class="bi bi-snow2 text-secondary font-weight-bolder pr-2"></i> Stemming</div>
+                    <div id='Doc_Statistics' class="control basic border-secondary"><i class="fa fa-line-chart text-secondary font-weight-bolder pr-2"></i> Doc Statistics</div>
 
                     <div class="p-1 w-100 text-light  bg-info"> Graph Analysis</div>
-                    <div id='Graph_Creation' class="control"><i class="bi bi-diagram-3-fill text-success"></i> Graph Creation</div>
-                    <div id='Graph_Viewer' class="control"><i class="bi bi-easel-fill text-success"></i> Graph Viewer</div>
+                    <div id='Graph_Creation' class="control border-secondary"><i class="bi bi-diagram-3-fill text-secondary"></i> Graph Creation</div>
+                    <div id='Graph_Viewer' class="control border-secondary"><i class="bi bi-easel-fill text-secondary"></i> Graph Viewer</div>
 
 
                 </div>
@@ -355,7 +355,13 @@
                                             $(state_selector).text('Created');
                                             $(tip_selector).text('Select a zip file.');
 
+
+
                                         } else {
+                                            text_color = 'text-info';
+                                            border_color = 'border-info';
+
+
                                             $(text_input_selector).removeClass('border-info');
                                             $(text_input_selector).removeClass('border-danger');
                                             $(text_input_selector).addClass('border-success');
@@ -363,8 +369,22 @@
                                             $(file_btn_selector).removeClass('btn-outline-danger');
                                             $(file_btn_selector).addClass('btn-outline-success');
                                             $(state_selector).text('Ready');
+                                            $(state_selector).removeClass("text-success text-info' text-warning text-danger text-secondary");
+                                            $(state_selector).addClass(text_color);
                                             $(tip_selector).text('');
 
+
+                                            controll_selector = 'div.control#'.concat(form_id);
+                                            icon_selector = controll_selector.concat(' i');
+
+                                            $(controll_selector).removeClass("text-success text-info' text-warning text-danger text-secondary");
+                                            $(controll_selector).addClass(text_color);
+
+                                            $(icon_selector).removeClass("text-success text-info' text-warning text-danger text-secondary");
+                                            $(icon_selector).addClass(text_color);
+
+                                            $(controll_selector).removeClass("border-success border-info border-warning border-danger border-secondary");
+                                            $(controll_selector).addClass(border_color);
                                             // $(source_collection_selector).text($(text_input_selector).val());
                                         }
                                     });
