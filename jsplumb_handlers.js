@@ -1,5 +1,8 @@
  // https://stackoverflow.com/a/2117523
 
+ var host = 'http://localhost:8000/';
+ //  var host = 'https://tenat.pythonanywhere.com/';
+
  // function for make an uique id for each dropped node in workspace
  function uuidv4() {
      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -552,15 +555,7 @@
      // import collection run
      $('form.import_collection button').click(function() {
 
-         var connected = instance.getConnections();
-         //  alert(connected[0].source.id);
-         $.each(connected, function(e, s) {
-             //connection repaint
-             s.repaint();
 
-             //  alert(s.source.id);
-             //  alert(s.target.id);
-         });
 
          // chceck duplicate connection at binding
          //  var con = info.connection;
@@ -573,6 +568,20 @@
          form_id = $(this).closest('form').attr('id');
          file_uploader_selector = '#' + form_id.concat(' #FilUploader');
          file_uploader = $(file_uploader_selector)[0];
+
+
+
+         //  var connected = instance.getConnections();
+         //  var conn = jsPlumb.select({ source: form_id });
+         //  alert(conn[0].id);
+         //  //  alert(connected[0].source.id);
+         //  $.each(connected, function(e, s) {
+         //      //connection repaint
+         //      s.repaint();
+
+         //      //  alert(s.source.id);
+         //      //  alert(s.target.id);
+         //  });
 
          var numFiles = file_uploader.files ? file_uploader.files.length : 1;
          if (numFiles < 1) {
@@ -590,13 +599,13 @@
              $(source_collection_selector).text(file_name);
              formData.append('name', file_name); //این فیلد را می توانی حذف کنی
              formData.append('file', file_uploader.files[0]);
-             url = 'https://tenat.pythonanywhere.com/api/import/';
+             url = host + 'api/import/';
              // alert(file_uploader[0].files[0]);
-             send_request(formData, url, form_id, 'import_collection')
+             send_request(formData, url, form_id, 'import_collection');
+             update_meta_data()
          }
 
      });
-
 
 
      // tokenization Run
@@ -610,7 +619,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('splitter', ' ');
-         url = 'https://tenat.pythonanywhere.com/api/tokenize/';
+         url = host + 'api/tokenize/';
          send_request(formData, url, form_id, 'tokenization');
      });
 
@@ -626,7 +635,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('language', language);
-         url = 'https://tenat.pythonanywhere.com/api/stop-word-removal/';
+         url = host + 'api/stop-word-removal/';
          send_request(formData, url, form_id, 'stopword_removal');
      });
 
@@ -642,7 +651,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('language', language);
-         url = 'https://tenat.pythonanywhere.com/api/doc-statistics/';
+         url = host + 'api/doc-statistics/';
          send_request(formData, url, form_id, 'doc_statistics');
 
      });
@@ -658,7 +667,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('language', language);
-         url = 'https://tenat.pythonanywhere.com/api/stem/';
+         url = host + 'api/stem/';
          send_request(formData, url, form_id, 'stemming');
 
      });
@@ -725,13 +734,13 @@
          // alert($('#FilUploader')[0].files[0]);
          $.ajax({
              //  url: "https://localhost:8000/api/export/",
-             url: "https://tenat.pythonanywhere.com/api/export/",
+             url: host + "api/export/",
              data: formData,
              type: 'POST',
              contentType: false,
              processData: false
          }).done(function(res) {
-             file_src = 'https://tenat.pythonanywhere.com/' + res;
+             file_src = host + res;
              download_file(file_src, form_id, source_node);
 
          });
