@@ -1,7 +1,7 @@
  // https://stackoverflow.com/a/2117523
 
- var host = 'http://localhost:8000/';
- //  var host = 'https://tenat.pythonanywhere.com/';
+ //  var host = 'http://localhost:8000/';
+ var host = 'https://tenat.pythonanywhere.com/';
 
  // function for make an uique id for each dropped node in workspace
  function uuidv4() {
