@@ -1,5 +1,8 @@
  // https://stackoverflow.com/a/2117523
 
+ var host = 'http://localhost:8000/';
+ //  var host = 'https://tenat.pythonanywhere.com/';
+
  // function for make an uique id for each dropped node in workspace
  function uuidv4() {
      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -11,51 +14,193 @@
  instance = jsPlumb.getInstance({});
  instance.setContainer("workspace");
 
+
+
+
+
+ function update_meta_data(form_selector, source_collection, source_node, source_id, state, tip) {
+     // get form by form selector
+     target_collection_selector = form_selector.concat(' .meta-data p.source_collection');
+     target_node_selector = form_selector.concat(' .meta-data p.source_node');
+     target_ID_selector = form_selector.concat(' .meta-data p.source_id');
+     target_state_selector = form_selector.concat(' .meta-data p.state');
+
+     if (source_collection != 'default') {
+         $(target_collection_selector).text(source_collection);
+
+     }
+     if (source_node != 'default') {
+         $(target_node_selector).text(source_node);
+
+     }
+     if (source_id != 'default') {
+         $(target_ID_selector).text(source_id);
+
+     }
+     if (state != 'default') {
+         $(target_state_selector).text(state);
+
+         let color = '';
+         if (state == 'Created') {
+             color = 'secondary';
+         } else if (state == 'Ready') {
+             color = 'info';
+
+         } else if (state == 'Completed') {
+             color = 'success';
+
+         } else if (state == 'Failed') {
+             color = 'danger';
+
+         }
+
+         text_color = 'text-'.concat(color);
+
+         $(target_state_selector).removeClass("text-success text-info text-warning text-danger text-secondary");
+         $(target_state_selector).addClass(text_color);
+     }
+
+
+
+
+     //get meta-data options and update with function parameters
+
+ }
+
+ function update_controll_color(controll_id, state) {
+
+     if (state != 'default') {
+         let color = '';
+         if (state == 'Created') {
+             color = 'secondary';
+         } else if (state == 'Ready') {
+             color = 'info';
+
+         } else if (state == 'Completed') {
+             color = 'success';
+
+         } else if (state == 'Failed') {
+             color = 'danger';
+
+         }
+
+         text_color = 'text-'.concat(color);
+         border_color = 'border-'.concat(color);
+
+         controll_selector = 'div.control#'.concat(controll_id);
+         icon_selector = controll_selector.concat(' i');
+
+         $(controll_selector).removeClass("text-success text-info text-warning text-danger text-secondary");
+         $(controll_selector).addClass(text_color);
+
+         $(icon_selector).removeClass("text-success text-info text-warning text-danger text-secondary");
+         $(icon_selector).addClass(text_color);
+
+         $(controll_selector).removeClass("border-success border-info border-warning border-danger border-secondary");
+         $(controll_selector).addClass(border_color);
+     }
+
+
+
+ }
+
+
+ function check_connection(source_node, target_node) {
+
+     if (source_node == 'Import_Collection' &&
+         (target_node == 'Tokenization')) {
+         return true;
+     } else if (source_node == 'Tokenization' && (target_node == 'Stemming' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics')) {
+         return true;
+     } else if (source_node == 'Stemming' && (target_node == 'Export_File' || target_node == 'Stopword_Removal')) {
+         return true;
+     } else if (source_node == 'Stopword_Removal' && (target_node == 'Stemming' || target_node == 'Export_File')) {
+         return true;
+     } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || target_node == 'STW_Removal' || target_node == 'Doc_Statistics')) {
+         return true;
+     } else return false;
+
+ }
+
+
  instance.bind("connection", function(info) {
+
+
+
      //  source selector
      source_id = info.source.id;
      source_node = source_id.split('-')[0];
      source_unique_id = source_id.replace(source_node + '-', '');
      source_form_selector = 'form#'.concat(source_id);;
      source_collection_selector = source_form_selector.concat(' .meta-data p.source_collection');
-     state_selector = source_form_selector.concat(' .meta-data p.state');
+     source_state_selector = source_form_selector.concat(' .meta-data p.state');
+     source_collection = $(source_collection_selector).text();
 
      //  target selector
      target_id = info.target.id;
+     target_node = target_id.split('-')[0];
      target_form_selector = 'form#'.concat(target_id);
-     target_collection_selector = target_form_selector.concat(' .meta-data p.source_collection');
-     target_node_selector = target_form_selector.concat(' .meta-data p.source_node');
-     target_ID_selector = target_form_selector.concat(' .meta-data p.source_id');
-     target_state_selector = target_form_selector.concat(' .meta-data p.state');
 
-     $(target_collection_selector).text($(source_collection_selector).text());
-     $(target_node_selector).text(source_node);
-     $(target_ID_selector).text(source_unique_id);
-     $(target_state_selector).text('Ready');
+
+
+
+     if ($(source_state_selector).text() == 'Completed') {
+         update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, 'Ready');
+         update_controll_color(target_id, 'Ready');
+     }
+
+
+     if (!check_connection(source_node, target_node)) {
+         var endpoints = instance.getEndpoints(target_id);
+         endpoint = endpoints[0];
+         //  endpoints[0].setPaintStyle({
+         //      color: "red",
+         //  });
+
+
+         info.connection.setPaintStyle({
+             stroke: "#d9534f",
+             strokeWidth: 4,
+         });
+         info.connection.setHoverPaintStyle({
+             stroke: "#d9534f",
+             strokeWidth: 4,
+         });
+         setTimeout(function() {
+             instance.deleteConnection(info.connection);
+         }, 250);
+     } else {
+         //  var endpoints = instance.getEndpoints(target_id);
+         //  endpoint = endpoints[0];
+         //  endpoint.connectionType = 'green-connection';
+         //  alert(endpoint.connectionType);
+         //  instance.repaint(endpoint.id);
+         //  setTimeout(function() {
+         //      info.connection.setPaintStyle({
+         //          stroke: "green",
+         //      });
+         //      info.connection.setHoverPaintStyle({
+         //          stroke: "green",
+         //      });
+         //  }, 500);
+         //  instance.repaint(info.connection);
+
+     }
+     //  instance.selectEndpoints({ source: element }).each(function (endpoint) {
+     //     endpoint.connectorStyle.dashstyle = "2 4";
+     //     instance.repaint(element);
+     // });
 
  });
 
  instance.bind("connectionDetached", function(info) {
      //  source selector
-     source_id = info.source.id;
-     source_node = source_id.split('-')[0];
-     source_unique_id = source_id.replace(source_node + '-', '');
-     source_form_selector = 'form#'.concat(source_id);;
-     source_collection_selector = source_form_selector.concat(' .meta-data p.source_collection');
-     state_selector = source_form_selector.concat(' .meta-data p.state');
-
      //  target selector
      target_id = info.target.id;
      target_form_selector = 'form#'.concat(target_id);
-     target_collection_selector = target_form_selector.concat(' .meta-data p.source_collection');
-     target_node_selector = target_form_selector.concat(' .meta-data p.source_node');
-     target_ID_selector = target_form_selector.concat(' .meta-data p.source_id');
-     target_state_selector = target_form_selector.concat(' .meta-data p.state');
 
-     $(target_collection_selector).text('');
-     $(target_node_selector).text('');
-     $(target_ID_selector).text('');
-     $(target_state_selector).text('Created');
+     update_meta_data(target_form_selector, '', '', '', 'Created', '');
+     update_controll_color(target_id, 'Created');
 
  });
 
@@ -67,7 +212,7 @@
 
      // define connection type
      instance.registerConnectionTypes({
-         "red-connection": {
+         "gray-connection": {
              paintStyle: {
                  stroke: "gray",
                  strokeWidth: 2,
@@ -81,7 +226,39 @@
                  strokeWidth: 8
              },
              connector: "Bezier"
+         },
+         "red-connection": {
+             paintStyle: {
+                 stroke: "red",
+                 strokeWidth: 2,
+                 // reattach: true,
+                 // outlineWidth: 0.5,
+                 // outlineStroke: 'yellow',
+                 // dashstyle: '2 1'
+             },
+             hoverPaintStyle: {
+                 stroke: "red",
+                 strokeWidth: 8
+             },
+             connector: "Bezier"
+         },
+
+         "green-connection": {
+             paintStyle: {
+                 stroke: "red",
+                 strokeWidth: 2,
+                 // reattach: true,
+                 // outlineWidth: 0.5,
+                 // outlineStroke: 'yellow',
+                 // dashstyle: '2 1'
+             },
+             hoverPaintStyle: {
+                 stroke: "red",
+                 strokeWidth: 8
+             },
+             connector: "Bezier"
          }
+
      });
      // instance.draggable("control1", {
      //     "containment": true
@@ -220,7 +397,7 @@
                      endpoint: "Dot",
                      anchor: ["RightMiddle"],
                      isSource: true,
-                     connectionType: "red-connection",
+                     connectionType: "gray-connection",
                      maxConnections: 10
                  });
              } else if (draggable_element_id.includes('Export')) {
@@ -228,7 +405,7 @@
                      endpoint: "Dot",
                      anchor: ["LeftMiddle"],
                      isTarget: true,
-                     connectionType: "red-connection",
+                     connectionType: "gray-connection",
                      maxConnections: 1
                  });
              } else {
@@ -236,7 +413,7 @@
                      endpoint: "Dot",
                      anchor: ["LeftMiddle"],
                      isTarget: true,
-                     connectionType: "red-connection",
+                     connectionType: "gray-connection",
                      maxConnections: 10
 
                  });
@@ -244,7 +421,7 @@
                      endpoint: "Dot",
                      anchor: ["RightMiddle"],
                      isSource: true,
-                     connectionType: "red-connection",
+                     connectionType: "gray-connection",
                      maxConnections: 10
                  });
              }
@@ -292,6 +469,7 @@
          node_id = $(this).attr('id');
          // alert(node_id);
          update_info_preview_segment(node_id);
+         //  $(this).addClass('font-italic');
 
      });
 
@@ -329,8 +507,52 @@
          return source_node;
      }
 
+
+
+     function get_target_nodes(source_node_id) {
+         let target_nodes = [];
+         //  var conn = instance.getConnections({
+         //      source: source_node_id,
+         //  });
+         //  alert(conn.source);
+         var connected = instance.getConnections();
+         //   var conn = instance.select({ source: form_id });
+         //   alert(conn[0]);
+         //  alert(connected[0].source.id);
+         $.each(connected, function(e, s) {
+             //connection repaint
+             //  s.repaint();
+             if (s.source.id == source_node_id) {
+                 target_nodes.push(s.target.id);
+             }
+             //  alert(s.source.id);
+         });
+         return target_nodes;
+     }
+
+
+     function update_connected_node(source_form_id) {
+         target_nodes = get_target_nodes(form_id);
+
+         source_id = form_id;
+         source_node = source_id.split('-')[0];
+         source_unique_id = source_id.replace(source_node + '-', '');
+         source_form_selector = 'form#'.concat(source_id);;
+         source_collection_selector = source_form_selector.concat(' .meta-data p.source_collection');
+         source_state_selector = source_form_selector.concat(' .meta-data p.state');
+         source_collection = $(source_collection_selector).text();
+
+
+         $.each(target_nodes, function(index, value) {
+             target_form_selector = 'form#'.concat(value);
+             update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, 'Ready');
+             update_controll_color(value, 'Ready');
+
+         });
+     }
+
      function send_request(formData, url, form_id, form_class) {
-         state_selector = 'form#'.concat(form_id) + ' .meta-data p.state';
+         form_selector = 'form#'.concat(form_id);
          $.ajax({
              url: url,
              data: formData,
@@ -341,36 +563,70 @@
              table_selector = 'table#'.concat(form_id) + ' tbody';
              $(table_selector).children().remove();
              $.each(res, function(index, value) {
-                 if (form_class == 'import_collection') {
-                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.name + '</td>' + '<td class="col-4">' + value.text + '</td>' + '<td class="col-3">' + String(Math.round(Number(value.size) / 1000)) + '</td>' + '</tr>');
+                 if (index > 0) {
+                     if (form_class == 'import_collection') {
+                         $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.name + '</td>' + '<td class="col-4">' + value.text + '</td>' + '<td class="col-3">' + String(Math.round(Number(value.size) / 1000)) + '</td>' + '</tr>');
 
-                 } else if (form_class == 'tokenization') {
-                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.tokens + '</td>' + '<td class="col-2">' + value.tokens_count + '</td>' + '</tr>');
+                     } else if (form_class == 'tokenization') {
+                         $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_tokenized + '</td>' + '<td class="col-2">' + value.tokens_count + '</td>' + '</tr>');
 
-                 } else if (form_class == 'stopword_removal') {
-                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_10_removed_words + '</td>' + '<td class="col-2">' + value.removed_count + '</td>' + '</tr>');
+                     } else if (form_class == 'stopword_removal') {
+                         $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_10_removed_words + '</td>' + '<td class="col-2">' + value.removed_count + '</td>' + '</tr>');
 
-                 } else if (form_class == 'doc_statistics') {
-                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-2">' + value.distinct + '</td>' + '<td class="col-2">' + value.stop + '</td>' + '<td class="col-2">' + value.main + '</td>' + '</tr>');
+                     } else if (form_class == 'doc_statistics') {
+                         $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-2">' + value.distinct + '</td>' + '<td class="col-2">' + value.stop + '</td>' + '<td class="col-2">' + value.main + '</td>' + '</tr>');
 
-                 } else if (form_class == 'stemming') {
-                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
+                     } else if (form_class == 'stemming') {
+                         $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
 
+                     }
                  }
+
              });
-             $(state_selector).text('Completed');
+
+             update_controll_color(form_id, 'Completed');
+             update_meta_data(form_selector, 'default', 'default', 'default', 'Completed', '');
+             update_connected_node(form_id);
 
          }).fail(function(res) {
              $(state_selector).text('Failed');
+             $(state_selector).removeClass("text-success text-warning text-info text-secondary");
              $(state_selector).addClass('text-danger');
+             update_controll_color(form_id, 'Failed');
+             update_meta_data(form_id, 'default', 'default', 'default', 'Fialed', '');
 
          });
      }
      // import collection run
      $('form.import_collection button').click(function() {
+
+
+
+         // chceck duplicate connection at binding
+         //  var con = info.connection;
+         //  var arr = jsPlumb.select({ source: con.sourceId, target: con.targetId });
+         //  if (arr.length > 1) {
+         //      jsPlumb.detach(con);
+         //  }
+
+
          form_id = $(this).closest('form').attr('id');
          file_uploader_selector = '#' + form_id.concat(' #FilUploader');
          file_uploader = $(file_uploader_selector)[0];
+
+
+
+         //  var connected = instance.getConnections();
+         //  var conn = jsPlumb.select({ source: form_id });
+         //  alert(conn[0].id);
+         //  //  alert(connected[0].source.id);
+         //  $.each(connected, function(e, s) {
+         //      //connection repaint
+         //      s.repaint();
+
+         //      //  alert(s.source.id);
+         //      //  alert(s.target.id);
+         //  });
 
          var numFiles = file_uploader.files ? file_uploader.files.length : 1;
          if (numFiles < 1) {
@@ -388,13 +644,12 @@
              $(source_collection_selector).text(file_name);
              formData.append('name', file_name); //این فیلد را می توانی حذف کنی
              formData.append('file', file_uploader.files[0]);
-             url = 'https://tenat.pythonanywhere.com/api/import/';
+             url = host + 'api/import/';
              // alert(file_uploader[0].files[0]);
-             send_request(formData, url, form_id, 'import_collection')
+             send_request(formData, url, form_id, 'import_collection');
          }
 
      });
-
 
 
      // tokenization Run
@@ -408,7 +663,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('splitter', ' ');
-         url = 'https://tenat.pythonanywhere.com/api/tokenize/';
+         url = host + 'api/tokenize/';
          send_request(formData, url, form_id, 'tokenization');
      });
 
@@ -424,7 +679,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('language', language);
-         url = 'https://tenat.pythonanywhere.com/api/stop-word-removal/';
+         url = host + 'api/stop-word-removal/';
          send_request(formData, url, form_id, 'stopword_removal');
      });
 
@@ -440,7 +695,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('language', language);
-         url = 'https://tenat.pythonanywhere.com/api/doc-statistics/';
+         url = host + 'api/doc-statistics/';
          send_request(formData, url, form_id, 'doc_statistics');
 
      });
@@ -456,7 +711,7 @@
          formData.append('name', file_name);
          formData.append('from', source_node);
          formData.append('language', language);
-         url = 'https://tenat.pythonanywhere.com/api/stem/';
+         url = host + 'api/stem/';
          send_request(formData, url, form_id, 'stemming');
 
      });
@@ -467,6 +722,7 @@
          source_node_selector = 'form#'.concat(form_id) + ' .meta-data p.source_node';
          file_name = $(source_collection_selector).text();
          source_node = $(source_node_selector).text();
+         form_selector = 'form#'.concat(form_id);
          // file_name = $('#text-input').val();
          file_name_wo_extention = file_name.split('.').slice(0, -1).join('.')
          state_selector = 'form#'.concat(form_id) + ' .meta-data p.state';
@@ -478,8 +734,8 @@
 
              },
              success: function(data) {
-                 form_selector = 'form#'.concat(form_id) + ' #export_data_output_format';
-                 var output_format = $(form_selector).find(":selected").text();
+                 format_selector = 'form#'.concat(form_id) + ' #export_data_output_format';
+                 var output_format = $(format_selector).find(":selected").text();
                  var output_node = node_class.concat('_output');
                  var a = document.createElement('a');
                  var url = window.URL.createObjectURL(data);
@@ -490,10 +746,15 @@
                  a.remove();
                  window.URL.revokeObjectURL(url);
                  $(state_selector).text('Completed');
+                 update_controll_color(form_id, 'Completed');
+                 update_meta_data(form_selector, 'default', 'default', 'default', 'Completed', '');
              }
          }).fail(function(res) {
              $(state_selector).text('Failed');
              $(state_selector).addClass('text-danger');
+             update_controll_color(form_id, 'Failed');
+             update_meta_data(form_selector, 'default', 'default', 'default', 'Failed', '');
+
 
          });
      }
@@ -517,13 +778,13 @@
          // alert($('#FilUploader')[0].files[0]);
          $.ajax({
              //  url: "https://localhost:8000/api/export/",
-             url: "https://tenat.pythonanywhere.com/api/export/",
+             url: host + "api/export/",
              data: formData,
              type: 'POST',
              contentType: false,
              processData: false
          }).done(function(res) {
-             file_src = 'https://tenat.pythonanywhere.com/' + res;
+             file_src = host + res;
              download_file(file_src, form_id, source_node);
 
          });
