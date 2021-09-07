@@ -10,18 +10,7 @@
 In this file we hand all actions in the workspase page
 The actions divide into two category:
 
-1. jsPlumb library actions consists in:
-    - drag a node from nodes segment
-    - drop a node into workspace segment
-    - delete a node from  workspace segment
-    - add connection between two nodes in workspace segment
-    - delete connection from two nodes in workspace segment
-    - click on a node in workspace
--------------------------------------------------------------
-2. Runing action
-    - click on run button in node_info segment
-**************************************************************
-*/
+
 
 /*----------------------  Variables  ------------------------- */
 
