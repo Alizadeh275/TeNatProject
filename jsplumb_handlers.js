@@ -1,5 +1,4 @@
 /*  
-
 % File Structure:
 1. Variables Segment
 2. Functions Segment
@@ -19,7 +18,7 @@ The actions divide into two category:
     - delete connection from two nodes in workspace segment
     - click on a node in workspace
 -------------------------------------------------------------
-2. Run action
+2. Runing action
     - click on run button in node_info segment
 **************************************************************
 */
@@ -265,16 +264,11 @@ function get_target_nodes(source_node_id) {
 
 function update_connected_node(form_id) {
     target_nodes = get_target_nodes(form_id);
-
     source_id = form_id;
     source_node = source_id.split('-')[0];
     source_unique_id = source_id.replace(source_node + '-', '');
-    source_form_selector = 'form#'.concat(source_id);;
-    source_collection_selector = source_form_selector.concat(' .meta-data p.source_collection');
-    source_state_selector = source_form_selector.concat(' .meta-data p.state');
-    source_collection = $(source_collection_selector).text();
-    source_address_selector = source_form_selector.concat(' .meta-data p.source_address');
-    source_address = $(source_address_selector).text();
+    source_collection = get_node_info_field(form_id, 'file_name');
+    source_address = get_node_info_field(form_id, 'source_address');
 
 
     $.each(target_nodes, function(index, value) {
@@ -351,12 +345,12 @@ instance.bind("connection", function(info) {
     source_node = source_id.split('-')[0];
     source_unique_id = source_id.replace(source_node + '-', '');
     source_form_selector = 'form#'.concat(source_id);;
-    source_collection_selector = source_form_selector.concat(' .meta-data p.source_collection');
-    source_collection = $(source_collection_selector).text();
+
+    source_collection = get_node_info_field(source_id, 'file_name');
     source_state_selector = source_form_selector.concat(' .meta-data p.state');
 
-    source_address_selector = source_form_selector.concat(' .meta-data p.source_address');
-    source_address = $(source_address_selector).text();
+    source_address = get_node_info_field(source_id, 'source_address');
+
     //  target selector
     target_id = info.target.id;
     target_node = target_id.split('-')[0];
@@ -629,7 +623,8 @@ instance.bind("ready", function() {
 
             // Create preview selection
             create_preview_segment(node_id, draggable_element_id);
-
+            $('#workspace .control').css({ 'box-shadow': '', 'border-width': '2px' });
+            $(clone).css({ 'box-shadow': '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)', 'border-width': '4px' });
             /* --------#########################--------- */
 
             // table_selector = 'table#'.concat(draggable_element_id);
@@ -645,12 +640,14 @@ instance.bind("ready", function() {
 
 
     // update preview & node info segment when click on a node in workspace
-    $("body").on("click", ".control", function(event) {
+    $("body").on("click", "#workspace .control", function(event) {
 
         node_name = $(this).attr('name');
         node_id = $(this).attr('id');
         // alert(node_id);
         update_info_preview_segment(node_id);
+        $('#workspace .control').css({ 'box-shadow': '', 'border-width': '2px' });
+        $(this).css({ 'box-shadow': '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)', 'border-width': '4px' });
         //  $(this).addClass('font-italic');
 
     });
