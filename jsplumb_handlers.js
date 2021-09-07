@@ -263,7 +263,7 @@ function get_target_nodes(source_node_id) {
 }
 
 
-function update_connected_node(source_form_id) {
+function update_connected_node(form_id) {
     target_nodes = get_target_nodes(form_id);
 
     source_id = form_id;
