@@ -1,7 +1,7 @@
  // https://stackoverflow.com/a/2117523
 
- var host = 'http://localhost:8000/';
- //  var host = 'https://tenat.pythonanywhere.com/';
+ //  var host = 'http://localhost:8000/';
+ var host = 'https://tenat.pythonanywhere.com/';
 
  // function for make an uique id for each dropped node in workspace
  function uuidv4() {
@@ -18,11 +18,12 @@
 
 
 
- function update_meta_data(form_selector, source_collection, source_node, source_id, state, tip) {
+ function update_meta_data(form_selector, source_collection, source_node, source_id, source_address, state, tip) {
      // get form by form selector
      target_collection_selector = form_selector.concat(' .meta-data p.source_collection');
      target_node_selector = form_selector.concat(' .meta-data p.source_node');
      target_ID_selector = form_selector.concat(' .meta-data p.source_id');
+     target_address_selector = form_selector.concat(' .meta-data p.source_address');
      target_state_selector = form_selector.concat(' .meta-data p.state');
 
      if (source_collection != 'default') {
@@ -37,6 +38,13 @@
          $(target_ID_selector).text(source_id);
 
      }
+
+     if (source_address != 'default') {
+         $(target_address_selector).text(source_address);
+
+     }
+
+
      if (state != 'default') {
          $(target_state_selector).text(state);
 
@@ -112,11 +120,11 @@
          return true;
      } else if (source_node == 'Tokenization' && (target_node == 'Stemming' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics')) {
          return true;
-     } else if (source_node == 'Stemming' && (target_node == 'Export_File' || target_node == 'Stopword_Removal')) {
+     } else if (source_node == 'Stemming' && (target_node == 'Export_File' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics')) {
          return true;
-     } else if (source_node == 'Stopword_Removal' && (target_node == 'Stemming' || target_node == 'Export_File')) {
+     } else if (source_node == 'Stopword_Removal' && (target_node == 'Stemming' || target_node == 'Export_File' || target_node == 'Doc_Statistics')) {
          return true;
-     } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || target_node == 'STW_Removal' || target_node == 'Doc_Statistics')) {
+     } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'STW_Removal' || source_node == 'Doc_Statistics')) {
          return true;
      } else return false;
 
@@ -133,9 +141,11 @@
      source_unique_id = source_id.replace(source_node + '-', '');
      source_form_selector = 'form#'.concat(source_id);;
      source_collection_selector = source_form_selector.concat(' .meta-data p.source_collection');
-     source_state_selector = source_form_selector.concat(' .meta-data p.state');
      source_collection = $(source_collection_selector).text();
+     source_state_selector = source_form_selector.concat(' .meta-data p.state');
 
+     source_address_selector = source_form_selector.concat(' .meta-data p.source_address');
+     source_address = $(source_address_selector).text();
      //  target selector
      target_id = info.target.id;
      target_node = target_id.split('-')[0];
@@ -145,7 +155,7 @@
 
 
      if ($(source_state_selector).text() == 'Completed') {
-         update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, 'Ready');
+         update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, source_address, 'Ready', '');
          update_controll_color(target_id, 'Ready');
      }
 
@@ -414,7 +424,7 @@
                      anchor: ["LeftMiddle"],
                      isTarget: true,
                      connectionType: "gray-connection",
-                     maxConnections: 10
+                     maxConnections: 1
 
                  });
                  instance.addEndpoint(node_id, {
@@ -509,6 +519,12 @@
 
 
 
+     function get_source_address(form_id) {
+         source_address_selector = 'form#'.concat(form_id) + ' .meta-data p.source_address';
+         source_address = $(source_address_selector).text();
+         return source_address;
+     }
+
      function get_target_nodes(source_node_id) {
          let target_nodes = [];
          //  var conn = instance.getConnections({
@@ -541,11 +557,13 @@
          source_collection_selector = source_form_selector.concat(' .meta-data p.source_collection');
          source_state_selector = source_form_selector.concat(' .meta-data p.state');
          source_collection = $(source_collection_selector).text();
+         source_address_selector = source_form_selector.concat(' .meta-data p.source_address');
+         source_address = $(source_address_selector).text();
 
 
          $.each(target_nodes, function(index, value) {
              target_form_selector = 'form#'.concat(value);
-             update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, 'Ready');
+             update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, source_address, 'Ready', '');
              update_controll_color(value, 'Ready');
 
          });
@@ -553,6 +571,8 @@
 
      function send_request(formData, url, form_id, form_class) {
          form_selector = 'form#'.concat(form_id);
+         let source_address = '';
+
          $.ajax({
              url: url,
              data: formData,
@@ -568,7 +588,7 @@
                          $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.name + '</td>' + '<td class="col-4">' + value.text + '</td>' + '<td class="col-3">' + String(Math.round(Number(value.size) / 1000)) + '</td>' + '</tr>');
 
                      } else if (form_class == 'tokenization') {
-                         $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_tokenized + '</td>' + '<td class="col-2">' + value.tokens_count + '</td>' + '</tr>');
+                         $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.tokens + '</td>' + '<td class="col-2">' + value.tokens_count + '</td>' + '</tr>');
 
                      } else if (form_class == 'stopword_removal') {
                          $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_10_removed_words + '</td>' + '<td class="col-2">' + value.removed_count + '</td>' + '</tr>');
@@ -580,12 +600,19 @@
                          $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
 
                      }
+                 } else {
+
+                     source_address = value.file_name;
+                     if (typeof(value.output_path) != 'undefined') {
+                         source_address = value.output_path;
+                     }
+                     update_meta_data(form_selector, value.file_name, 'default', 'default', source_address, 'default', '');
                  }
 
              });
 
              update_controll_color(form_id, 'Completed');
-             update_meta_data(form_selector, 'default', 'default', 'default', 'Completed', '');
+             update_meta_data(form_selector, 'default', 'default', 'default', source_address, 'Completed', '');
              update_connected_node(form_id);
 
          }).fail(function(res) {
@@ -599,8 +626,6 @@
      }
      // import collection run
      $('form.import_collection button').click(function() {
-
-
 
          // chceck duplicate connection at binding
          //  var con = info.connection;
@@ -675,9 +700,10 @@
          file_name = get_file_name(form_id);
          language = get_language(form_id);
          source_node = get_source_node(form_id);
+         source_address = get_source_address(form_id);
 
          formData.append('name', file_name);
-         formData.append('from', source_node);
+         formData.append('from', source_address);
          formData.append('language', language);
          url = host + 'api/stop-word-removal/';
          send_request(formData, url, form_id, 'stopword_removal');
@@ -691,25 +717,31 @@
          file_name = get_file_name(form_id);
          language = get_language(form_id);
          source_node = get_source_node(form_id);
+         source_address = get_source_address(form_id);
+
 
          formData.append('name', file_name);
-         formData.append('from', source_node);
+         formData.append('from', source_address);
          formData.append('language', language);
          url = host + 'api/doc-statistics/';
          send_request(formData, url, form_id, 'doc_statistics');
 
      });
 
-     // doc_statistics Run
+
+
+
+     // stemming Run
      $('form.stemming button').click(function() {
          var formData = new FormData();
          form_id = $(this).closest('form').attr('id');
          file_name = get_file_name(form_id);
          language = get_language(form_id);
          source_node = get_source_node(form_id);
+         source_address = get_source_address(form_id);
 
          formData.append('name', file_name);
-         formData.append('from', source_node);
+         formData.append('from', source_address);
          formData.append('language', language);
          url = host + 'api/stem/';
          send_request(formData, url, form_id, 'stemming');
@@ -717,7 +749,12 @@
      });
 
 
-     function download_file(url, form_id, node_class) {
+
+     function correct_address_node_names(address) {
+         return address.replace('stop_word', 'stopword_removed').replace('media/result/', '').replace('/', '_').concat('_output');
+     }
+
+     function download_file(url, form_id, sequence_address) {
          source_collection_selector = 'form#'.concat(form_id) + ' .meta-data p.source_collection';
          source_node_selector = 'form#'.concat(form_id) + ' .meta-data p.source_node';
          file_name = $(source_collection_selector).text();
@@ -726,6 +763,7 @@
          // file_name = $('#text-input').val();
          file_name_wo_extention = file_name.split('.').slice(0, -1).join('.')
          state_selector = 'form#'.concat(form_id) + ' .meta-data p.state';
+
          $.ajax({
              url: url,
              method: 'GET',
@@ -736,7 +774,8 @@
              success: function(data) {
                  format_selector = 'form#'.concat(form_id) + ' #export_data_output_format';
                  var output_format = $(format_selector).find(":selected").text();
-                 var output_node = node_class.concat('_output');
+                 var output_node = correct_address_node_names(sequence_address);
+                 output_node = output_node.replace(file_name, '');
                  var a = document.createElement('a');
                  var url = window.URL.createObjectURL(data);
                  a.href = url;
@@ -747,13 +786,13 @@
                  window.URL.revokeObjectURL(url);
                  $(state_selector).text('Completed');
                  update_controll_color(form_id, 'Completed');
-                 update_meta_data(form_selector, 'default', 'default', 'default', 'Completed', '');
+                 update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'Completed', '');
              }
          }).fail(function(res) {
              $(state_selector).text('Failed');
              $(state_selector).addClass('text-danger');
              update_controll_color(form_id, 'Failed');
-             update_meta_data(form_selector, 'default', 'default', 'default', 'Failed', '');
+             update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'Failed', '');
 
 
          });
@@ -767,13 +806,14 @@
 
          file_name = get_file_name(form_id);
          source_node = get_source_node(form_id);
+         source_address = get_source_address(form_id);
          var formData = new FormData();
          // file_name = $('#text-input').val();
          //  file_name_wo_extention = file_name.split('.').slice(0, -1).join('.')
          //  state_selector = 'form#'.concat(form_id) + ' .meta-data p.state';
 
          formData.append('name', file_name);
-         formData.append('from', source_node);
+         formData.append('from', source_address);
          formData.append('format', '.txt');
          // alert($('#FilUploader')[0].files[0]);
          $.ajax({
@@ -785,7 +825,7 @@
              processData: false
          }).done(function(res) {
              file_src = host + res;
-             download_file(file_src, form_id, source_node);
+             download_file(file_src, form_id, source_address);
 
          });
      });
