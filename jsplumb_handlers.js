@@ -9,6 +9,9 @@
 % Actions:
 In this file we hand all actions in the workspase page
 The actions divide into two category:
+1. jsPlumb actions:
+    -
+2. Running action:
 
 
 
