@@ -308,6 +308,9 @@ function send_request(formData, url, form_id, form_class) {
                 if (typeof(value.output_path) != 'undefined') {
                     source_address = value.output_path;
                 }
+                if (form_class == 'import_collection') {
+                    source_address = value.file_name;
+                }
                 update_meta_data(form_selector, value.file_name, 'default', 'default', source_address, 'default', '');
             }
 
