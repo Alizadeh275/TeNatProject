@@ -3,15 +3,23 @@
 1. Variables Segment
 2. Functions Segment
 3. Actions Segment:
-    - jsPlumb actions
-    - Runing action
+    - JsPlumb Actions
+    - Runing Action
 **************************************************************
-% Actions:
+% JsPlumb Actions:
 In this file we hand all actions in the workspase page
 The actions divide into two category:
 1. jsPlumb actions:
-    -
-2. Running action:
+    - drag a node from nodes segment
+    - drop a node into workspace
+    - delete a node from workspace
+    - add connection between nodes in workspace
+    - delete connection from nodes
+    - click on a node in workspace
+2. Running Action:
+    - click on run button in node_info segment
+ **************************************************************
+   
 
 
 
