@@ -806,7 +806,7 @@ instance.bind("ready", function() {
                 var a = document.createElement('a');
                 var url = window.URL.createObjectURL(data);
                 a.href = url;
-                a.download = file_name_wo_extention + '_' + output_node + output_format;
+                a.download = file_name_wo_extention + '_' + output_node + '.zip';
                 document.body.append(a);
                 a.click();
                 a.remove();
@@ -841,7 +841,7 @@ instance.bind("ready", function() {
 
         formData.append('name', file_name);
         formData.append('from', source_address);
-        formData.append('format', '.txt');
+        formData.append('format', '.zip');
         // alert($('#FilUploader')[0].files[0]);
         $.ajax({
             //  url: "https://localhost:8000/api/export/",
