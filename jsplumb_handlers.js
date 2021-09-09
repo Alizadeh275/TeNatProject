@@ -30,6 +30,36 @@ var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
 instance.setContainer("workspace");
 
+const StateColor = {
+    Created: 'secondary',
+    Ready: 'info',
+    Running: 'warning',
+    Completed: 'success',
+    Failed: 'danger',
+    get_state_name: function(color) {
+        if (color == 'secondary') {
+            return 'Created';
+        } else if (color == 'info') {
+            return 'Ready';
+        } else if (color == 'warning') {
+            return 'Running';
+        } else if (color == 'success') {
+            return 'Completed';
+        } else if (color == 'danger') {
+            return 'Failed';
+        }
+    }
+}
+
+const ApiUrl = {
+    import_collection: 'api/import/',
+    tokenization: 'api/tokenize/',
+    stopword_removal: 'api/stop-word-removal/',
+    doc_statistics: 'api/doc-statistics/',
+    stemming: 'api/stem/',
+    export_file: 'api/export/',
+}
+
 /*-----------------------  Functions  ------------------------- */
 
 // function for make an uique id for each dropped node in workspace
@@ -68,72 +98,35 @@ function update_meta_data(form_selector, source_collection, source_node, source_
 
     }
 
-
     if (state != 'default') {
-        $(target_state_selector).text(state);
-
-        let color = '';
-        if (state == 'Created') {
-            color = 'secondary';
-        } else if (state == 'Ready') {
-            color = 'info';
-
-        } else if (state == 'Completed') {
-            color = 'success';
-
-        } else if (state == 'Failed') {
-            color = 'danger';
-
-        }
-
-        text_color = 'text-'.concat(color);
-
+        $(target_state_selector).text(StateColor.get_state_name(state));
+        text_color = 'text-'.concat(state);
         $(target_state_selector).removeClass("text-success text-info text-warning text-danger text-secondary");
         $(target_state_selector).addClass(text_color);
     }
 
-
-
-
-    //get meta-data options and update with function parameters
-
 }
 
 // function for updating color of node in workspace segment
-function update_controll_color(controll_id, state) {
+function update_controll_color(control_id, color) {
 
-    if (state != 'default') {
-        let color = '';
-        if (state == 'Created') {
-            color = 'secondary';
-        } else if (state == 'Ready') {
-            color = 'info';
+    text_color = 'text-'.concat(color);
+    border_color = 'border-'.concat(color);
 
-        } else if (state == 'Completed') {
-            color = 'success';
+    controll_selector = 'div.control#'.concat(control_id);
+    icon_selector = controll_selector.concat(' i');
 
-        } else if (state == 'Failed') {
-            color = 'danger';
+    // update node name color
+    $(controll_selector).removeClass("text-success text-info text-warning text-danger text-secondary");
+    $(controll_selector).addClass(text_color);
 
-        }
+    // update icon color
+    $(icon_selector).removeClass("text-success text-info text-warning text-danger text-secondary");
+    $(icon_selector).addClass(text_color);
 
-        text_color = 'text-'.concat(color);
-        border_color = 'border-'.concat(color);
-
-        controll_selector = 'div.control#'.concat(controll_id);
-        icon_selector = controll_selector.concat(' i');
-
-        $(controll_selector).removeClass("text-success text-info text-warning text-danger text-secondary");
-        $(controll_selector).addClass(text_color);
-
-        $(icon_selector).removeClass("text-success text-info text-warning text-danger text-secondary");
-        $(icon_selector).addClass(text_color);
-
-        $(controll_selector).removeClass("border-success border-info border-warning border-danger border-secondary");
-        $(controll_selector).addClass(border_color);
-    }
-
-
+    // update node border color
+    $(controll_selector).removeClass("border-success border-info border-warning border-danger border-secondary");
+    $(controll_selector).addClass(border_color);
 
 }
 
@@ -196,19 +189,7 @@ function create_node_info_segment(node_id, draggable_element_id) {
 
 
 /* ----------------------- */
-// Un-used function
-function set_form_data(form_id) {
-    let formData;
-    source_collection_selector = 'form#'.concat(form_id) + ' .meta-data p.source_collection';
-    file_name = $(source_collection_selector).text();
 
-    language_selector = 'form#'.concat(form_id) + ' select#inputState';
-    language = $(language_selector).find(":selected").text();
-    source_node_selector = 'form#'.concat(form_id) + ' .meta-data p.source_node';
-    source_node = $(source_node_selector).text();
-
-    return formData;
-}
 
 // functio for getting specific data form node parameters or node meta data
 function get_node_info_field(form_id, field) {
@@ -273,8 +254,8 @@ function update_connected_node(form_id) {
 
     $.each(target_nodes, function(index, value) {
         target_form_selector = 'form#'.concat(value);
-        update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, source_address, 'Ready', '');
-        update_controll_color(value, 'Ready');
+        update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, source_address, StateColor.Ready, '');
+        update_controll_color(value, StateColor.Ready);
 
     });
 }
@@ -324,19 +305,60 @@ function send_request(formData, url, form_id, form_class) {
 
         });
 
-        update_controll_color(form_id, 'Completed');
-        update_meta_data(form_selector, 'default', 'default', 'default', source_address, 'Completed', '');
+        update_controll_color(form_id, StateColor.Completed);
+        update_meta_data(form_selector, 'default', 'default', 'default', source_address, StateColor.Completed, '');
         update_connected_node(form_id);
 
     }).fail(function(res) {
-        $(state_selector).text('Failed');
-        $(state_selector).removeClass("text-success text-warning text-info text-secondary");
-        $(state_selector).addClass('text-danger');
-        update_controll_color(form_id, 'Failed');
-        update_meta_data(form_id, 'default', 'default', 'default', 'default', 'Fialed', '');
+        // $(state_selector).text('Failed');
+        // $(state_selector).removeClass("text-success text-warning text-info text-secondary");
+        // $(state_selector).addClass('text-danger');
+        update_controll_color(form_id, StateColor.Failed);
+        update_meta_data(form_selector, 'default', 'default', 'default', 'default', StateColor.Failed, '');
 
     });
 }
+
+// ****************************************************************
+
+function get_form_fields(form_class) {
+
+    if (form_class == 'import') {
+
+    } else if (form_class == 'tokenization') {
+
+    } else if (form_class == 'stopword_removal') {
+
+    } else if (form_class == 'doc_statistics') {
+
+    } else if (form_class == 'stemming') {
+
+    } else if (form_class == 'export_file') {
+
+    }
+
+}
+// Un-used function
+function set_form_data(form_id, fields) {
+    let formData = new FormData();
+    for (let index = 0; index < fields.length; index++) {
+        let field = fields[index];
+        formData.append(field, get_node_info_field(form_id, field));
+
+    };
+    return formData;
+}
+
+function basic_running() {
+    form_id = $(this).closest('form').attr('id');
+    form_class = $(this).closest('form').attr('class');
+    fields = get_form_fields(form_class);
+    url = host + ApiUrl[form_class];
+    formData = set_form_data(form_id, fields);
+    send_request(formData, url, form_id, form_class);
+}
+
+
 
 
 /*-----------------------  Actions  ------------------------- */
@@ -363,8 +385,8 @@ instance.bind("connection", function(info) {
 
 
     if ($(source_state_selector).text() == 'Completed') {
-        update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, source_address, 'Ready', '');
-        update_controll_color(target_id, 'Ready');
+        update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, source_address, StateColor.Ready, '');
+        update_controll_color(target_id, StateColor.Ready);
     }
 
 
@@ -417,8 +439,8 @@ instance.bind("connectionDetached", function(info) {
     target_id = info.target.id;
     target_form_selector = 'form#'.concat(target_id);
 
-    update_meta_data(target_form_selector, '', '', '', 'Created', '');
-    update_controll_color(target_id, 'Created');
+    update_meta_data(target_form_selector, '', '', '', StateColor.Created, '');
+    update_controll_color(target_id, StateColor.Created);
 
 });
 
@@ -823,14 +845,15 @@ instance.bind("ready", function() {
                 a.remove();
                 window.URL.revokeObjectURL(url);
                 $(state_selector).text('Completed');
-                update_controll_color(form_id, 'Completed');
-                update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'Completed', '');
+                update_controll_color(form_id, StateColor.Completed);
+                update_meta_data(form_selector, 'default', 'default', 'default', 'default', StateColor.Completed, '');
             }
+
         }).fail(function(res) {
-            $(state_selector).text('Failed');
-            $(state_selector).addClass('text-danger');
-            update_controll_color(form_id, 'Failed');
-            update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'Failed', '');
+            // $(state_selector).text('Failed');
+            // $(state_selector).addClass('text-danger');
+            update_controll_color(form_id, StateColor.Failed);
+            update_meta_data(form_selector, 'default', 'default', 'default', 'default', StateColor.Failed, '');
 
 
         });
@@ -841,6 +864,7 @@ instance.bind("ready", function() {
         // alert(instance.getConnections()[0]);
 
         form_id = $(this).closest('form').attr('id');
+        form_selector = 'form#'.concat(form_id);
 
         file_name = get_node_info_field(form_id, 'file_name');
         source_node = get_node_info_field(form_id, 'source_node');
@@ -860,11 +884,14 @@ instance.bind("ready", function() {
             data: formData,
             type: 'POST',
             contentType: false,
-            processData: false
+            processData: false,
         }).done(function(res) {
             file_src = host + res;
             download_file(file_src, form_id, source_address);
 
+        }).fail(function(res) {
+            update_controll_color(form_id, StateColor.Failed);
+            update_meta_data(form_selector, 'default', 'default', 'default', 'default', StateColor.Failed, '');
         });
     });
 
