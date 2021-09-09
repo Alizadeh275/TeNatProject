@@ -3,15 +3,23 @@
 1. Variables Segment
 2. Functions Segment
 3. Actions Segment:
-    - jsPlumb actions
-    - Runing action
+    - JsPlumb Actions
+    - Runing Action
 **************************************************************
-% Actions:
+% JsPlumb Actions:
 In this file we hand all actions in the workspase page
 The actions divide into two category:
 1. jsPlumb actions:
-    -
-2. Running action:
+    - drag a node from nodes segment
+    - drop a node into workspace
+    - delete a node from workspace
+    - add connection between nodes in workspace
+    - delete connection from nodes
+    - click on a node in workspace
+2. Running Action:
+    - click on run button in node_info segment
+ **************************************************************
+   
 
 
 
@@ -325,7 +333,7 @@ function send_request(formData, url, form_id, form_class) {
         $(state_selector).removeClass("text-success text-warning text-info text-secondary");
         $(state_selector).addClass('text-danger');
         update_controll_color(form_id, 'Failed');
-        update_meta_data(form_id, 'default', 'default', 'default', 'Fialed', '');
+        update_meta_data(form_id, 'default', 'default', 'default', 'default', 'Fialed', '');
 
     });
 }
@@ -781,7 +789,7 @@ instance.bind("ready", function() {
 
 
     function correct_address_node_names(address) {
-        return address.replace('stop_word', 'stopword_removed').replace('media/result/', '').replace('/', '_').concat('_output');
+        return address.replace('media/result/', '').replace('stop_word', 'stopword_removed').replace('/', '_').concat('_output');
     }
 
     function download_file(url, form_id, sequence_address) {
@@ -809,7 +817,7 @@ instance.bind("ready", function() {
                 var a = document.createElement('a');
                 var url = window.URL.createObjectURL(data);
                 a.href = url;
-                a.download = file_name_wo_extention + '_' + output_node + '.zip';
+                a.download = file_name_wo_extention + '_' + output_node + output_format;
                 document.body.append(a);
                 a.click();
                 a.remove();
