@@ -30,6 +30,8 @@ var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
 instance.setContainer("workspace");
 
+
+// color of each state
 const StateColor = {
     Created: 'secondary',
     Ready: 'info',
@@ -51,14 +53,41 @@ const StateColor = {
     }
 }
 
-const ApiUrl = {
-    import_collection: 'api/import/',
-    tokenization: 'api/tokenize/',
-    stopword_removal: 'api/stop-word-removal/',
-    doc_statistics: 'api/doc-statistics/',
-    stemming: 'api/stem/',
-    export_file: 'api/export/',
+//  api fields
+import_collection_api_fields = { name: 'file_name', file: 'file' };
+
+// tokenization is always after import..so from = source_node
+tokenization_api_fields = { name: 'file_name', from: 'source_node', splitter: 'splitter' };
+
+stopword_removal_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
+doc_statistics_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
+stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
+export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
+
+
+// api object
+let import_collection_api = { name: 'import_collection', url: 'api/import/', fields: import_collection_api_fields }
+let tokenization_api = { name: 'tokenization', url: 'api/tokenize/', fields: tokenization_api_fields }
+let stopword_removal_api = {
+    name: 'stopword_removal',
+    url: 'api/stop-word-removal/',
+    fields: stopword_removal_api_fields
 }
+let doc_statistics_api = { name: 'doc_statistics', url: 'api/doc-statistics/', fields: doc_statistics_api_fields }
+let stemming_api = { name: 'stemming', url: 'api/stem/', fields: stemming_api_fields }
+let export_file_api = { name: 'export_file', url: 'api/export/', fields: export_file_api_fields }
+
+// api arrays
+const APIs = {
+    import_collection: import_collection_api,
+    tokenization: tokenization_api,
+    stopword_removal: stopword_removal_api,
+    doc_statistics: doc_statistics_api,
+    stemming: stemming_api,
+    export_file: export_file_api,
+
+}
+
 
 /*-----------------------  Functions  ------------------------- */
 
@@ -188,6 +217,15 @@ function create_node_info_segment(node_id, draggable_element_id) {
 }
 
 
+// make formData form each form by its  fields
+function make_formData(form_id, fields) {
+    let formData = new FormData();
+    $.each(fields, function(name, value) {
+        formData.append(name, get_node_info_field(form_id, value));
+    });
+    return formData;
+}
+
 /* ----------------------- */
 
 
@@ -203,6 +241,19 @@ function get_node_info_field(form_id, field) {
         p_selector = ' .meta-data p.source_collection';
 
     } else if (field == 'language') {
+
+        field_selector = form_selector + ' select#inputState';
+        field_value = $(field_selector).find(":selected").text();
+        return field_value;
+
+    } else if (field == 'splitter') {
+
+        field_selector = form_selector + ' select#inputState';
+        field_value = $(field_selector).find(":selected").text();
+        field_value = ' ';
+        return field_value;
+
+    } else if (field == 'output_format') {
 
         field_selector = form_selector + ' select#inputState';
         field_value = $(field_selector).find(":selected").text();
@@ -242,7 +293,7 @@ function get_target_nodes(source_node_id) {
     return target_nodes;
 }
 
-
+// update all connected nodes (meta data)
 function update_connected_node(form_id) {
     target_nodes = get_target_nodes(form_id);
     source_id = form_id;
@@ -250,7 +301,6 @@ function update_connected_node(form_id) {
     source_unique_id = source_id.replace(source_node + '-', '');
     source_collection = get_node_info_field(form_id, 'file_name');
     source_address = get_node_info_field(form_id, 'source_address');
-
 
     $.each(target_nodes, function(index, value) {
         target_form_selector = 'form#'.concat(value);
@@ -260,6 +310,7 @@ function update_connected_node(form_id) {
     });
 }
 
+// send ajax request to api
 function send_request(formData, url, form_id, form_class) {
     form_selector = 'form#'.concat(form_id);
     let source_address = '';
@@ -319,46 +370,15 @@ function send_request(formData, url, form_id, form_class) {
     });
 }
 
-// ****************************************************************
 
-function get_form_fields(form_class) {
+// function that runs when click on node run button (expect of import and export)
+function basic_running(form_id, form_class) {
 
-    if (form_class == 'import') {
-
-    } else if (form_class == 'tokenization') {
-
-    } else if (form_class == 'stopword_removal') {
-
-    } else if (form_class == 'doc_statistics') {
-
-    } else if (form_class == 'stemming') {
-
-    } else if (form_class == 'export_file') {
-
-    }
-
-}
-// Un-used function
-function set_form_data(form_id, fields) {
-    let formData = new FormData();
-    for (let index = 0; index < fields.length; index++) {
-        let field = fields[index];
-        formData.append(field, get_node_info_field(form_id, field));
-
-    };
-    return formData;
-}
-
-function basic_running() {
-    form_id = $(this).closest('form').attr('id');
-    form_class = $(this).closest('form').attr('class');
-    fields = get_form_fields(form_class);
-    url = host + ApiUrl[form_class];
-    formData = set_form_data(form_id, fields);
+    fields = APIs[form_class].fields;
+    url = host + APIs[form_class].url;
+    formData = make_formData(form_id, fields);
     send_request(formData, url, form_id, form_class);
 }
-
-
 
 
 /*-----------------------  Actions  ------------------------- */
@@ -546,7 +566,6 @@ instance.bind("ready", function() {
     });
     /* --------#########################-------------- */
 
-
     /* --------delete controll button-------------- */
     $("body").on("contextmenu", "#workspace .control", function(event) {
         event.preventDefault();
@@ -679,9 +698,6 @@ instance.bind("ready", function() {
 
     /* --------############    Run Controller      #############--------- */
 
-
-
-
     /*-----------------------  Runnig Segment  -------------------------*/
 
     // import collection run
@@ -740,71 +756,31 @@ instance.bind("ready", function() {
     // tokenization Run
     $('form.tokenization button').click(function() {
 
-        var formData = new FormData();
-
         form_id = $(this).closest('form').attr('id');
-        file_name = get_node_info_field(form_id, 'file_name');
-        source_node = get_node_info_field(form_id, 'source_node');
-        formData.append('name', file_name);
-        formData.append('from', source_node);
-        formData.append('splitter', ' ');
-        url = host + 'api/tokenize/';
-        send_request(formData, url, form_id, 'tokenization');
+        form_class = $(this).closest('form').attr('class').split(' ').pop();;
+        basic_running(form_id, form_class);
     });
 
     // stw_run Run
     $('form.stopword_removal button').click(function() {
-        var formData = new FormData();
-
         form_id = $(this).closest('form').attr('id');
-        file_name = get_node_info_field(form_id, 'file_name');
-        language = get_node_info_field(form_id, 'language');
-        source_node = get_node_info_field(form_id, 'source_node');
-        source_address = get_node_info_field(form_id, 'source_address');
-
-        formData.append('name', file_name);
-        formData.append('from', source_address);
-        formData.append('language', language);
-        url = host + 'api/stop-word-removal/';
-        send_request(formData, url, form_id, 'stopword_removal');
+        form_class = $(this).closest('form').attr('class').split(' ').pop();;
+        basic_running(form_id, form_class);
     });
-
 
     // doc_statistics Run
     $('form.doc_statistics button').click(function() {
-        var formData = new FormData();
         form_id = $(this).closest('form').attr('id');
-        file_name = get_node_info_field(form_id, 'file_name');
-        language = get_node_info_field(form_id, 'language');
-        source_node = get_node_info_field(form_id, 'source_node');
-        source_address = get_node_info_field(form_id, 'source_address');
-
-
-        formData.append('name', file_name);
-        formData.append('from', source_address);
-        formData.append('language', language);
-        url = host + 'api/doc-statistics/';
-        send_request(formData, url, form_id, 'doc_statistics');
+        form_class = $(this).closest('form').attr('class').split(' ').pop();;
+        basic_running(form_id, form_class);
 
     });
 
-
-
-
     // stemming Run
     $('form.stemming button').click(function() {
-        var formData = new FormData();
         form_id = $(this).closest('form').attr('id');
-        file_name = get_node_info_field(form_id, 'file_name');
-        language = get_node_info_field(form_id, 'language');
-        source_node = get_node_info_field(form_id, 'source_node');
-        source_address = get_node_info_field(form_id, 'source_address');
-
-        formData.append('name', file_name);
-        formData.append('from', source_address);
-        formData.append('language', language);
-        url = host + 'api/stem/';
-        send_request(formData, url, form_id, 'stemming');
+        form_class = $(this).closest('form').attr('class').split(' ').pop();;
+        basic_running(form_id, form_class);
 
     });
 
@@ -869,6 +845,7 @@ instance.bind("ready", function() {
         file_name = get_node_info_field(form_id, 'file_name');
         source_node = get_node_info_field(form_id, 'source_node');
         source_address = get_node_info_field(form_id, 'source_address');
+        output_format = get_node_info_field(form_id, 'output_format');
         var formData = new FormData();
         // file_name = $('#text-input').val();
         //  file_name_wo_extention = file_name.split('.').slice(0, -1).join('.')
@@ -876,11 +853,11 @@ instance.bind("ready", function() {
 
         formData.append('name', file_name);
         formData.append('from', source_address);
-        formData.append('format', '.zip');
+        formData.append('format', output_format);
         // alert($('#FilUploader')[0].files[0]);
         $.ajax({
             //  url: "https://localhost:8000/api/export/",
-            url: host + "api/export/",
+            url: host + export_file_api.url,
             data: formData,
             type: 'POST',
             contentType: false,
