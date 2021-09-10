@@ -57,7 +57,7 @@ const StateColor = {
 import_collection_api_fields = { name: 'file_name', file: 'file' };
 
 // tokenization is always after import..so from = source_node
-tokenization_api_fields = { name: 'file_name', from: 'source_node', splitter: 'splitter' };
+tokenization_api_fields = { name: 'file_name', from: 'source_node', seperator: 'seperator' };
 
 stopword_removal_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 doc_statistics_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
@@ -101,12 +101,13 @@ function uuidv4() {
 }
 
 // function for update meta_data in node_info segment
-function update_meta_data(form_selector, source_collection, source_node, source_id, source_address, state, tip) {
+function update_meta_data(form_selector, source_collection, source_node, source_id, source_address, current_address, state, tip) {
     // get form by form selector
     target_collection_selector = form_selector.concat(' .meta-data p.source_collection');
     target_node_selector = form_selector.concat(' .meta-data p.source_node');
     target_ID_selector = form_selector.concat(' .meta-data p.source_id');
     target_address_selector = form_selector.concat(' .meta-data p.source_address');
+    target_cc_address_selector = form_selector.concat(' .meta-data p.current_address');
     target_state_selector = form_selector.concat(' .meta-data p.state');
 
     if (source_collection != 'default') {
@@ -126,6 +127,12 @@ function update_meta_data(form_selector, source_collection, source_node, source_
         $(target_address_selector).text(source_address);
 
     }
+
+    if (current_address != 'default') {
+        $(target_cc_address_selector).text(current_address);
+
+    }
+
 
     if (state != 'default') {
         $(target_state_selector).text(StateColor.get_state_name(state));
@@ -242,21 +249,20 @@ function get_node_info_field(form_id, field) {
 
     } else if (field == 'language') {
 
-        field_selector = form_selector + ' select#inputState';
-        field_value = $(field_selector).find(":selected").text();
+        field_selector = form_selector + ' select#language';
+        field_value = $(field_selector).find(":selected").val();
         return field_value;
 
-    } else if (field == 'splitter') {
+    } else if (field == 'seperator') {
 
-        field_selector = form_selector + ' select#inputState';
-        field_value = $(field_selector).find(":selected").text();
-        field_value = ' ';
+        field_selector = form_selector + ' select#seperator';
+        field_value = $(field_selector).find(":selected").val();
         return field_value;
 
     } else if (field == 'output_format') {
 
-        field_selector = form_selector + ' select#inputState';
-        field_value = $(field_selector).find(":selected").text();
+        field_selector = form_selector + ' select#output_format';
+        field_value = $(field_selector).find(":selected").val();
         return field_value;
 
     } else if (field == 'source_node') {
@@ -264,6 +270,8 @@ function get_node_info_field(form_id, field) {
 
     } else if (field == 'source_address') {
         p_selector = ' .meta-data p.source_address';
+    } else if (field == 'current_address') {
+        p_selector = ' .meta-data p.current_address';
     }
 
     field_selector = form_selector + p_selector;
@@ -300,11 +308,11 @@ function update_connected_node(form_id) {
     source_node = source_id.split('-')[0];
     source_unique_id = source_id.replace(source_node + '-', '');
     source_collection = get_node_info_field(form_id, 'file_name');
-    source_address = get_node_info_field(form_id, 'source_address');
+    source_cc_address = get_node_info_field(form_id, 'current_address');
 
     $.each(target_nodes, function(index, value) {
         target_form_selector = 'form#'.concat(value);
-        update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, source_address, StateColor.Ready, '');
+        update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, source_cc_address, 'default', StateColor.Ready, '');
         update_controll_color(value, StateColor.Ready);
 
     });
@@ -344,20 +352,20 @@ function send_request(formData, url, form_id, form_class) {
                 }
             } else {
 
-                source_address = value.file_name;
+                current_address = value.file_name;
                 if (typeof(value.output_path) != 'undefined') {
-                    source_address = value.output_path;
+                    current_address = value.output_path;
                 }
                 if (form_class == 'import_collection') {
-                    source_address = value.file_name;
+                    current_address = value.file_name;
                 }
-                update_meta_data(form_selector, value.file_name, 'default', 'default', source_address, 'default', '');
+                update_meta_data(form_selector, value.file_name, 'default', 'default', 'default', current_address, 'default', '');
             }
 
         });
 
         update_controll_color(form_id, StateColor.Completed);
-        update_meta_data(form_selector, 'default', 'default', 'default', source_address, StateColor.Completed, '');
+        update_meta_data(form_selector, 'default', 'default', 'default', 'default', current_address, StateColor.Completed, '');
         update_connected_node(form_id);
 
     }).fail(function(res) {
@@ -365,7 +373,7 @@ function send_request(formData, url, form_id, form_class) {
         // $(state_selector).removeClass("text-success text-warning text-info text-secondary");
         // $(state_selector).addClass('text-danger');
         update_controll_color(form_id, StateColor.Failed);
-        update_meta_data(form_selector, 'default', 'default', 'default', 'default', StateColor.Failed, '');
+        update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
 
     });
 }
@@ -394,7 +402,7 @@ instance.bind("connection", function(info) {
     source_collection = get_node_info_field(source_id, 'file_name');
     source_state_selector = source_form_selector.concat(' .meta-data p.state');
 
-    source_address = get_node_info_field(source_id, 'source_address');
+    current_address = get_node_info_field(source_id, 'current_address');
 
     //  target selector
     target_id = info.target.id;
@@ -405,7 +413,7 @@ instance.bind("connection", function(info) {
 
 
     if ($(source_state_selector).text() == 'Completed') {
-        update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, source_address, StateColor.Ready, '');
+        update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, current_address, 'default', StateColor.Ready, '');
         update_controll_color(target_id, StateColor.Ready);
     }
 
@@ -459,7 +467,7 @@ instance.bind("connectionDetached", function(info) {
     target_id = info.target.id;
     target_form_selector = 'form#'.concat(target_id);
 
-    update_meta_data(target_form_selector, '', '', '', StateColor.Created, '');
+    update_meta_data(target_form_selector, '', '', '', 'default', StateColor.Created, '');
     update_controll_color(target_id, StateColor.Created);
 
 });
@@ -808,7 +816,7 @@ instance.bind("ready", function() {
 
             },
             success: function(data) {
-                format_selector = 'form#'.concat(form_id) + ' #export_data_output_format';
+                format_selector = 'form#'.concat(form_id) + ' #output_format';
                 var output_format = $(format_selector).find(":selected").text();
                 var output_node = correct_address_node_names(sequence_address);
                 output_node = output_node.replace(file_name, '');
@@ -822,14 +830,14 @@ instance.bind("ready", function() {
                 window.URL.revokeObjectURL(url);
                 $(state_selector).text('Completed');
                 update_controll_color(form_id, StateColor.Completed);
-                update_meta_data(form_selector, 'default', 'default', 'default', 'default', StateColor.Completed, '');
+                update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Completed, '');
             }
 
         }).fail(function(res) {
             // $(state_selector).text('Failed');
             // $(state_selector).addClass('text-danger');
             update_controll_color(form_id, StateColor.Failed);
-            update_meta_data(form_selector, 'default', 'default', 'default', 'default', StateColor.Failed, '');
+            update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
 
 
         });
@@ -868,7 +876,7 @@ instance.bind("ready", function() {
 
         }).fail(function(res) {
             update_controll_color(form_id, StateColor.Failed);
-            update_meta_data(form_selector, 'default', 'default', 'default', 'default', StateColor.Failed, '');
+            update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
         });
     });
 
