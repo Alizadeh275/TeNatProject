@@ -25,6 +25,7 @@
     <!-- Script for logging every ajax request  -->
     <script>
         $(document).ready(function() {
+
             $(document).ajaxStart(function() {
                 console.log('ajax start.');
                 // blockUI code with custom message
@@ -441,7 +442,7 @@
 
                             <div class="row mt-1 border-bottom px-1">
                                 <label class="text-secondary w-100">Source Address:</label>
-                                <p class=" mb-1 source_address" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                                <p class=" mb-1 source_address" style="text-overflow: ellipsis;white-space: nowrap;overflow: hidden;"></p>
                             </div>
 
                             <div class="row mt-1 border-bottom px-1">
@@ -466,9 +467,6 @@
 
                     <!-- Import Document Form -->
 
-
-
-
                     <!-- Tokenization Form -->
 
                     <form class="my-form-control d-none w-100 tokenization" id="Tokenization">
@@ -485,9 +483,9 @@
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Seperator:</label>
                             <select id="inputState" class="form-control pl-0 mt-0">
                                   <option  selected>space</option>
-                                  <option>comma</option>
+                                  <!-- <option>comma</option>
                                   <option>tab</option>
-                                  <option disabled>special character</option>
+                                  <option disabled>special character</option> -->
                                 </select>
                             <!-- <div class="form-check mt-2 px-0">
                                 <label class="form-check-label" for="flexCheckChecked">
@@ -748,9 +746,9 @@
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Output Format:</label>
                             <select id="export_data_output_format" class="pl-0 form-control">
-                                <option  selected>.txt</option>
-                                <option>.docx</option>
-                                <option>.csv</option>
+                                <option  selected>.zip</option>
+                                <option>.rar</option>
+                                <option>.7z</option>
                               </select>
 
                         </div>
