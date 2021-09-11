@@ -61,7 +61,7 @@ tokenization_api_fields = { name: 'file_name', from: 'source_node', seperator: '
 
 stopword_removal_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 doc_statistics_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
-stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
+stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
 export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
 
 
@@ -250,6 +250,12 @@ function get_node_info_field(form_id, field) {
     } else if (field == 'language') {
 
         field_selector = form_selector + ' select#language';
+        field_value = $(field_selector).find(":selected").val();
+        return field_value;
+
+    } else if (field == 'algorithm') {
+
+        field_selector = form_selector + ' select#algorithm';
         field_value = $(field_selector).find(":selected").val();
         return field_value;
 
