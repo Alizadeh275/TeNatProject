@@ -25,7 +25,7 @@ The actions divide into two category:
 
 /*----------------------  Variables  ------------------------- */
 
-//  var host = 'http://localhost:8000/';
+// var host = 'http://localhost:8000/';
 var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
 instance.setContainer("workspace");
@@ -276,8 +276,11 @@ function get_node_info_field(form_id, field) {
 
     } else if (field == 'source_address') {
         p_selector = ' .meta-data p.source_address';
+
     } else if (field == 'current_address') {
         p_selector = ' .meta-data p.current_address';
+    } else if (field == 'state') {
+        p_selector = ' .meta-data p.state';
     }
 
     field_selector = form_selector + p_selector;
@@ -387,11 +390,12 @@ function send_request(formData, url, form_id, form_class) {
 
 // function that runs when click on node run button (expect of import and export)
 function basic_running(form_id, form_class) {
-
     fields = APIs[form_class].fields;
     url = host + APIs[form_class].url;
     formData = make_formData(form_id, fields);
     send_request(formData, url, form_id, form_class);
+
+
 }
 
 
@@ -406,8 +410,8 @@ instance.bind("connection", function(info) {
     source_form_selector = 'form#'.concat(source_id);;
 
     source_collection = get_node_info_field(source_id, 'file_name');
-    source_state_selector = source_form_selector.concat(' .meta-data p.state');
 
+    source_state = get_node_info_field(source_id, 'state');
     current_address = get_node_info_field(source_id, 'current_address');
 
     //  target selector
@@ -418,7 +422,7 @@ instance.bind("connection", function(info) {
 
 
 
-    if ($(source_state_selector).text() == 'Completed') {
+    if (source_state == 'Completed') {
         update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, current_address, 'default', StateColor.Ready, '');
         update_controll_color(target_id, StateColor.Ready);
     }
