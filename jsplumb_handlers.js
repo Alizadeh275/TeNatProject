@@ -885,7 +885,7 @@ instance.bind("ready", function() {
                 update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
             });
         } else {
-            alert('Source address is not setted!');
+            alert('Source address is not defined!');
         }
 
 
