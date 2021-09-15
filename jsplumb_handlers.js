@@ -390,10 +390,17 @@ function send_request(formData, url, form_id, form_class) {
 
 // function that runs when click on node run button (expect of import and export)
 function basic_running(form_id, form_class) {
-    fields = APIs[form_class].fields;
-    url = host + APIs[form_class].url;
-    formData = make_formData(form_id, fields);
-    send_request(formData, url, form_id, form_class);
+
+    current_state = get_node_info_field(form_id, 'state');
+    if (current_state != 'Created') { // source addrss not setted.
+        fields = APIs[form_class].fields;
+        url = host + APIs[form_class].url;
+        formData = make_formData(form_id, fields);
+        send_request(formData, url, form_id, form_class);
+    } else { // try to set source_address
+        alert('Source address is not defined!');
+    }
+
 
 
 }
@@ -477,7 +484,7 @@ instance.bind("connectionDetached", function(info) {
     target_id = info.target.id;
     target_form_selector = 'form#'.concat(target_id);
 
-    update_meta_data(target_form_selector, '', '', '', 'default', StateColor.Created, '');
+    update_meta_data(target_form_selector, '', '', '', '', '', StateColor.Created, '');
     update_controll_color(target_id, StateColor.Created);
 
 });
@@ -809,14 +816,10 @@ instance.bind("ready", function() {
     }
 
     function download_file(url, form_id, sequence_address) {
-        source_collection_selector = 'form#'.concat(form_id) + ' .meta-data p.source_collection';
-        source_node_selector = 'form#'.concat(form_id) + ' .meta-data p.source_node';
-        file_name = $(source_collection_selector).text();
-        source_node = $(source_node_selector).text();
+        file_name = get_node_info_field(form_id, 'file_name');
+        source_node = get_node_info_field(form_id, 'source_node');
         form_selector = 'form#'.concat(form_id);
-        // file_name = $('#text-input').val();
         file_name_wo_extention = file_name.split('.').slice(0, -1).join('.')
-        state_selector = 'form#'.concat(form_id) + ' .meta-data p.state';
 
         $.ajax({
             url: url,
@@ -838,14 +841,11 @@ instance.bind("ready", function() {
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);
-                $(state_selector).text('Completed');
                 update_controll_color(form_id, StateColor.Completed);
                 update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Completed, '');
             }
 
         }).fail(function(res) {
-            // $(state_selector).text('Failed');
-            // $(state_selector).addClass('text-danger');
             update_controll_color(form_id, StateColor.Failed);
             update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
 
@@ -856,22 +856,16 @@ instance.bind("ready", function() {
     $('form.export_file button').click(function() {
 
         // alert(instance.getConnections()[0]);
-
         form_id = $(this).closest('form').attr('id');
+        form_class = 'export_file';
         form_selector = 'form#'.concat(form_id);
-
-        file_name = get_node_info_field(form_id, 'file_name');
-        source_node = get_node_info_field(form_id, 'source_node');
         source_address = get_node_info_field(form_id, 'source_address');
-        output_format = get_node_info_field(form_id, 'output_format');
-        var formData = new FormData();
-        // file_name = $('#text-input').val();
-        //  file_name_wo_extention = file_name.split('.').slice(0, -1).join('.')
-        //  state_selector = 'form#'.concat(form_id) + ' .meta-data p.state';
 
-        formData.append('name', file_name);
-        formData.append('from', source_address);
-        formData.append('format', output_format);
+
+        fields = APIs[form_class].fields;
+        url = host + APIs[form_class].url;
+        formData = make_formData(form_id, fields);
+
         // alert($('#FilUploader')[0].files[0]);
         $.ajax({
             //  url: "https://localhost:8000/api/export/",
