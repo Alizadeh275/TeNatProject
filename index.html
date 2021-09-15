@@ -446,6 +446,11 @@
                             </div>
 
                             <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
                                 <label class="text-secondary w-100">State:</label>
                                 <p class=" mb-1 state">Created</p>
                             </div>
@@ -481,8 +486,8 @@
                         <div class="form-group px-1">
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Seperator:</label>
-                            <select id="inputState" class="form-control pl-0 mt-0">
-                                  <option  selected>space</option>
+                            <select id="seperator" class="form-control pl-0 mt-0">
+                                  <option value=" "  selected>space</option>
                                   <!-- <option>comma</option>
                                   <option>tab</option>
                                   <option disabled>special character</option> -->
@@ -520,6 +525,11 @@
                             </div>
 
                             <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
                                 <label class="text-secondary w-100">State:</label>
                                 <p class=" mb-1 state">Created</p>
                             </div>
@@ -549,9 +559,9 @@
                         <div class="form-group px-1">
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
-                            <select id="inputState" class="form-control pl-0 mt-0">
-                                  <option  selected>English</option>
-                                  <option>Persian</option>
+                            <select id="language" class="form-control pl-0 mt-0">
+                                  <option value="English" selected>English</option>
+                                  <option value="Persian" >Persian</option>
                                 </select>
                             <!-- <div class="form-check mt-2 px-0">
                                 <label class="form-check-label" for="flexCheckChecked">
@@ -582,6 +592,11 @@
                             <div class="row mt-1 border-bottom px-1">
                                 <label class="text-secondary w-100">Source Address:</label>
                                 <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
                             </div>
 
                             <div class="row mt-1 border-bottom px-1">
@@ -614,9 +629,9 @@
                         <div class="form-group px-1">
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
-                            <select id="inputState" class="form-control pl-0 mt-0">
-                                  <option  selected>English</option>
-                                  <option>Persian</option>
+                            <select id="language" class="form-control pl-0 mt-0">
+                                <option value="English" selected>English</option>
+                                <option value="Persian" >Persian</option>
                                 </select>
                             <!-- <div class="form-check mt-2 px-0">
                                 <label class="form-check-label" for="flexCheckChecked">
@@ -647,6 +662,11 @@
                             <div class="row mt-1 border-bottom px-1">
                                 <label class="text-secondary w-100">Source Address:</label>
                                 <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
                             </div>
 
                             <div class="row mt-1 border-bottom px-1">
@@ -680,10 +700,19 @@
                         <div class="form-group px-1">
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
-                            <select id="inputState" class="form-control pl-0 mt-0">
-                                  <option  selected>English</option>
-                                  <option>Persian</option>
+                            <select id="language" class="form-control pl-0 mt-0">
+                                  <option value="English" selected>English</option>
+                                  <option value="Persian">Persian</option>
                                 </select>
+
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Algorithm:</label>
+                            <select id="algorithm" class="form-control pl-0 mt-0">
+                                      <option value="Porter" selected>Porter</option>
+                                      <option value="Snowball">Snowball</option>
+                                      <option value="Lancaster">Lancaster</option>
+                                    </select>
+
                             <!-- <div class="form-check mt-2 px-0">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     Chekbox:
@@ -716,6 +745,11 @@
                             </div>
 
                             <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
                                 <label class="text-secondary w-100">State:</label>
                                 <p class=" mb-1 state">Created</p>
                             </div>
@@ -745,10 +779,10 @@
                         <div class="form-group px-1">
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Output Format:</label>
-                            <select id="export_data_output_format" class="pl-0 form-control">
-                                <option  selected>.zip</option>
-                                <option>.rar</option>
-                                <option>.7z</option>
+                            <select id="output_format" class="pl-0 form-control">
+                                <option value=".zip" selected>.zip</option>
+                                <option value=".rar">.rar</option>
+                                <option value=".7z">.7z</option>
                               </select>
 
                         </div>
@@ -774,6 +808,12 @@
                             <div class="row mt-1 border-bottom px-1">
                                 <label class="text-secondary w-100">Source Address:</label>
                                 <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
                             </div>
 
                             <div class="row mt-1 border-bottom px-1">
