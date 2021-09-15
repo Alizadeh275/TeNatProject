@@ -25,8 +25,8 @@ The actions divide into two category:
 
 /*----------------------  Variables  ------------------------- */
 
-var host = 'http://localhost:8000/';
-// var host = 'https://tenat.pythonanywhere.com/';
+// var host = 'http://localhost:8000/';
+var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
 instance.setContainer("workspace");
 
