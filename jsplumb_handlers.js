@@ -857,31 +857,38 @@ instance.bind("ready", function() {
 
         // alert(instance.getConnections()[0]);
         form_id = $(this).closest('form').attr('id');
-        form_class = 'export_file';
-        form_selector = 'form#'.concat(form_id);
-        source_address = get_node_info_field(form_id, 'source_address');
+        current_state = get_node_info_field(form_id, 'state');
+        if (current_state != 'Created') {
+            form_class = 'export_file';
+            form_selector = 'form#'.concat(form_id);
+            source_address = get_node_info_field(form_id, 'source_address');
 
 
-        fields = APIs[form_class].fields;
-        url = host + APIs[form_class].url;
-        formData = make_formData(form_id, fields);
+            fields = APIs[form_class].fields;
+            url = host + APIs[form_class].url;
+            formData = make_formData(form_id, fields);
 
-        // alert($('#FilUploader')[0].files[0]);
-        $.ajax({
-            //  url: "https://localhost:8000/api/export/",
-            url: host + export_file_api.url,
-            data: formData,
-            type: 'POST',
-            contentType: false,
-            processData: false,
-        }).done(function(res) {
-            file_src = host + res;
-            download_file(file_src, form_id, source_address);
+            // alert($('#FilUploader')[0].files[0]);
+            $.ajax({
+                //  url: "https://localhost:8000/api/export/",
+                url: host + export_file_api.url,
+                data: formData,
+                type: 'POST',
+                contentType: false,
+                processData: false,
+            }).done(function(res) {
+                file_src = host + res;
+                download_file(file_src, form_id, source_address);
 
-        }).fail(function(res) {
-            update_controll_color(form_id, StateColor.Failed);
-            update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
-        });
+            }).fail(function(res) {
+                update_controll_color(form_id, StateColor.Failed);
+                update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
+            });
+        } else {
+            alert('Source address is not setted!');
+        }
+
+
     });
 
 
