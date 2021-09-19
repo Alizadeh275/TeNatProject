@@ -25,8 +25,8 @@ The actions divide into two category:
 
 /*----------------------  Variables  ------------------------- */
 
-// var host = 'http://localhost:8000/';
-var host = 'https://tenat.pythonanywhere.com/';
+var host = 'http://localhost:8000/';
+// var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
 instance.setContainer("workspace");
 
@@ -63,6 +63,8 @@ stopword_removal_api_fields = { name: 'file_name', from: 'source_address', langu
 doc_statistics_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
 export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
+tf_idf_api_fields = { name: 'file_name', from: 'source_address', tf: 'tf', idf: 'idf' };
+graph_creation_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_similarity: 'min_similarity' };
 
 
 // api object
@@ -76,6 +78,8 @@ let stopword_removal_api = {
 let doc_statistics_api = { name: 'doc_statistics', url: 'api/doc-statistics/', fields: doc_statistics_api_fields }
 let stemming_api = { name: 'stemming', url: 'api/stem/', fields: stemming_api_fields }
 let export_file_api = { name: 'export_file', url: 'api/export/', fields: export_file_api_fields }
+let tf_idf_api = { name: 'tf_idf', url: 'api/tf-idf/', fields: tf_idf_api_fields }
+let graph_creation_api = { name: 'graph_creation', url: 'api/graph-creation/', fields: graph_creation_api_fields }
 
 // api arrays
 const APIs = {
@@ -85,6 +89,8 @@ const APIs = {
     doc_statistics: doc_statistics_api,
     stemming: stemming_api,
     export_file: export_file_api,
+    tf_idf: tf_idf_api,
+    graph_creation: graph_creation_api,
 
 }
 
@@ -354,6 +360,7 @@ function send_request(formData, url, form_id, form_class) {
 
                 } else if (form_class == 'doc_statistics') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-2">' + value.distinct + '</td>' + '<td class="col-2">' + value.stop + '</td>' + '<td class="col-2">' + value.main + '</td>' + '</tr>');
+                    // $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-6">' + value.frequent + '</td>'  + '</tr>');
 
                 } else if (form_class == 'stemming') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
@@ -846,6 +853,7 @@ instance.bind("ready", function() {
             }
 
         }).fail(function(res) {
+            alert('f');
             update_controll_color(form_id, StateColor.Failed);
             update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
 

@@ -82,7 +82,7 @@
                     <div class="p-1 w-100 text-light bg-info"> Basic Analysis</div>
                     <div id='Tokenization' class="control basic border-secondary"><i class="bi bi-funnel-fill text-secondary"></i> Tokenization</div>
                     <div id='Stopword_Removal' class="control basic border-secondary"><i class="bi bi-eraser-fill text-secondary"></i> STW Removal</div>
-                    <div id='TF_IDF_Weight' class="control basic border-secondary"><i class="bi bi-table text-secondary "></i> TF-IDF Weight</div>
+                    <div id='TF_IDF' class="control basic border-secondary"><i class="bi bi-table text-secondary "></i> TF-IDF Weight</div>
                     <div id='Stemming' class="control basic border-secondary"><i class="bi bi-snow2 text-secondary font-weight-bolder pr-2"></i> Stemming</div>
                     <div id='Doc_Statistics' class="control basic border-secondary"><i class="fa fa-line-chart text-secondary font-weight-bolder pr-2"></i> Doc Statistics</div>
 
@@ -244,6 +244,46 @@
                                 <td>Mark</td>
                                 <td>Otto</td>
                             </tr> -->
+                        </tbody>
+                    </table>
+
+                    <!--  -->
+                    <!-- TF_IDF -->
+                    <table id="TF_IDF" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Term</th>
+                                <th scope="col"> Weight</th>
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+
+                    <!-- Graph_Creation -->
+                    <table id="Graph_Creation" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Source</th>
+                                <th scope="col"> Target</th>
+                                <th scope="col"> Similarity</th>
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+        </tr> -->
                         </tbody>
                     </table>
 
@@ -474,7 +514,6 @@
                         </div>
                     </form>
 
-                    <!-- Import Document Form -->
 
                     <!-- Tokenization Form -->
 
@@ -643,12 +682,6 @@
                                 <option value="English" selected>English</option>
                                 <option value="Persian">Persian</option>
                             </select>
-                            <!-- <div class="form-check mt-2 px-0">
-                                <label class="form-check-label" for="flexCheckChecked">
-                                    Chekbox:
-                                  </label>
-                                <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
-                            </div> -->
 
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
@@ -794,24 +827,17 @@
                         <div class="form-group px-1">
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">TF:</label>
-                            <select id="language" class="form-control pl-0 mt-0">
-                                <option value="default_tf" selected>English</option>
+                            <select id="tf" class="form-control pl-0 mt-0">
+                                <option value="default_tf" selected>tf_formula</option>
                             </select>
 
 
-                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Algorithm:</label>
-                            <select id="algorithm" class="form-control pl-0 mt-0">
-                                <option value="Porter" selected>Porter</option>
-                                <option value="Snowball">Snowball</option>
-                                <option value="Lancaster">Lancaster</option>
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">IDF:</label>
+                            <select id="idf" class="form-control pl-0 mt-0">
+                                <option value="default_idf" selected>idf_formula</option>
+                                <!-- <option value="Snowball">Snowball</option>
+                                <option value="Lancaster">Lancaster</option> -->
                             </select>
-
-                            <!-- <div class="form-check mt-2 px-0">
-            <label class="form-check-label" for="flexCheckChecked">
-                Chekbox:
-              </label>
-            <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
-        </div> -->
 
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
@@ -856,6 +882,90 @@
 
                         </div>
                     </form>
+
+
+                    <!-- Graph_Creation -->
+
+                    <form class="my-form-control d-none w-100 graph_creation" id="Graph_Creation">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Graph Creation</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Type:</label>
+                            <select id="tf" class="form-control pl-0 mt-0">
+                                <option value="co-occurence" selected>co-occurence</option>
+                                <option value="bi-gram">bi-gram</option>
+            <option value="tri-gram">tri-gram</option>
+                            </select>
+
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Minimum Similarity:</label>
+                            <select id="idf" class="form-control pl-0 mt-0">
+                                <option value="0.0" selected>0.0</option>
+                                <option value="0.1">0.1</option>
+                                <option value="0.2">0.2</option>
+                                <option value="0.3">0.3</option>
+                                <option value="0.4">0.4</option>
+                                <option value="0.5">0.5</option>
+                                <option value="0.6">0.6</option>
+                                <option value="0.7">0.7</option>
+                                <option value="0.8">0.8</option>
+                                <option value="0.9">0.9</option>
+                                <option value="1.0">1.0</option>
+                            </select>
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
 
 
 
