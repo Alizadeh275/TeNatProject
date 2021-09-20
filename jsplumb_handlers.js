@@ -25,8 +25,8 @@ The actions divide into two category:
 
 /*----------------------  Variables  ------------------------- */
 
-var host = 'http://localhost:8000/';
-// var host = 'https://tenat.pythonanywhere.com/';
+// var host = 'http://localhost:8000/';
+var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
 instance.setContainer("workspace");
 
@@ -64,7 +64,7 @@ doc_statistics_api_fields = { name: 'file_name', from: 'source_address', languag
 stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
 export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
 tf_idf_api_fields = { name: 'file_name', from: 'source_address', tf: 'tf', idf: 'idf' };
-graph_creation_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_similarity: 'min_similarity' };
+graph_creation_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
 
 
 // api object
@@ -79,7 +79,7 @@ let doc_statistics_api = { name: 'doc_statistics', url: 'api/doc-statistics/', f
 let stemming_api = { name: 'stemming', url: 'api/stem/', fields: stemming_api_fields }
 let export_file_api = { name: 'export_file', url: 'api/export/', fields: export_file_api_fields }
 let tf_idf_api = { name: 'tf_idf', url: 'api/tf-idf/', fields: tf_idf_api_fields }
-let graph_creation_api = { name: 'graph_creation', url: 'api/graph-creation/', fields: graph_creation_api_fields }
+let graph_creation_api = { name: 'graph_creation', url: 'api/graph-construction/', fields: graph_creation_api_fields }
 
 // api arrays
 const APIs = {
@@ -178,13 +178,17 @@ function check_connection(source_node, target_node) {
     if (source_node == 'Import_Collection' &&
         (target_node == 'Tokenization')) {
         return true;
-    } else if (source_node == 'Tokenization' && (target_node == 'Stemming' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics')) {
+    } else if (source_node == 'Tokenization' && (target_node != 'Tokenization')) {
         return true;
     } else if (source_node == 'Stemming' && (target_node == 'Export_File' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics')) {
         return true;
     } else if (source_node == 'Stopword_Removal' && (target_node == 'Stemming' || target_node == 'Export_File' || target_node == 'Doc_Statistics')) {
         return true;
     } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'STW_Removal' || source_node == 'Doc_Statistics')) {
+        return true;
+    } else if (target_node == 'Graph_Creation' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'STW_Removal')) {
+        return true;
+    } else if (source_node == 'Graph_Creation' && (target_node == 'Graph_Viewer' || target_node == 'Export_File')) {
         return true;
     } else return false;
 
@@ -277,6 +281,18 @@ function get_node_info_field(form_id, field) {
         field_value = $(field_selector).find(":selected").val();
         return field_value;
 
+    } else if (field == 'mingraph_type_sim') {
+
+        field_selector = form_selector + ' select#graph_type';
+        field_value = $(field_selector).find(":selected").val();
+        return field_value;
+
+    } else if (field == 'min_sim') {
+
+        field_selector = form_selector + ' select#min_sim';
+        field_value = $(field_selector).find(":selected").val();
+        return field_value;
+
     } else if (field == 'source_node') {
         p_selector = ' .meta-data p.source_node';
 
@@ -364,6 +380,9 @@ function send_request(formData, url, form_id, form_class) {
 
                 } else if (form_class == 'stemming') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
+
+                } else if (form_class == 'graph_creation') {
+                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.source + '</td>' + '<td class="col-6">' + value.target + '</td>' + '<td class="col-2">' + value.sim + '</td>' + '</tr>');
 
                 }
             } else {
@@ -666,7 +685,7 @@ instance.bind("ready", function() {
                     connectionType: "gray-connection",
                     maxConnections: 10
                 });
-            } else if (draggable_element_id.includes('Export')) {
+            } else if (draggable_element_id.includes('Export') || draggable_element_id.includes('Graph_Viewer')) {
                 instance.addEndpoint(node_id, {
                     endpoint: "Dot",
                     anchor: ["LeftMiddle"],
@@ -732,91 +751,6 @@ instance.bind("ready", function() {
 
     /*-----------------------  Runnig Segment  -------------------------*/
 
-    // import collection run
-    $('form.import_collection button').click(function() {
-
-        // chceck duplicate connection at binding
-        //  var con = info.connection;
-        //  var arr = jsPlumb.select({ source: con.sourceId, target: con.targetId });
-        //  if (arr.length > 1) {
-        //      jsPlumb.detach(con);
-        //  }
-
-
-        form_id = $(this).closest('form').attr('id');
-        file_uploader_selector = '#' + form_id.concat(' #FilUploader');
-        file_uploader = $(file_uploader_selector)[0];
-
-
-
-        //  var connected = instance.getConnections();
-        //  var conn = jsPlumb.select({ source: form_id });
-        //  alert(conn[0].id);
-        //  //  alert(connected[0].source.id);
-        //  $.each(connected, function(e, s) {
-        //      //connection repaint
-        //      s.repaint();
-
-        //      //  alert(s.source.id);
-        //      //  alert(s.target.id);
-        //  });
-
-        var numFiles = file_uploader.files ? file_uploader.files.length : 1;
-        if (numFiles < 1) {
-            alert('Import a collection!');
-        } else {
-            text_input_selector = '#' + form_id.concat(' #text-input');
-            var formData = new FormData();
-            file_name = $(text_input_selector).val();
-
-
-            source_form_selector = 'form#'.concat(form_id);;
-            source_collection_selector = source_form_selector.concat(' .meta-data p.source_collection');
-            //  alert($(source_form_selector).attr('id'));
-
-            $(source_collection_selector).text(file_name);
-            formData.append('name', file_name); //این فیلد را می توانی حذف کنی
-            formData.append('file', file_uploader.files[0]);
-            url = host + 'api/import/';
-            // alert(file_uploader[0].files[0]);
-            send_request(formData, url, form_id, 'import_collection');
-        }
-
-    });
-
-
-    // tokenization Run
-    $('form.tokenization button').click(function() {
-
-        form_id = $(this).closest('form').attr('id');
-        form_class = $(this).closest('form').attr('class').split(' ').pop();;
-        basic_running(form_id, form_class);
-    });
-
-    // stw_run Run
-    $('form.stopword_removal button').click(function() {
-        form_id = $(this).closest('form').attr('id');
-        form_class = $(this).closest('form').attr('class').split(' ').pop();;
-        basic_running(form_id, form_class);
-    });
-
-    // doc_statistics Run
-    $('form.doc_statistics button').click(function() {
-        form_id = $(this).closest('form').attr('id');
-        form_class = $(this).closest('form').attr('class').split(' ').pop();;
-        basic_running(form_id, form_class);
-
-    });
-
-    // stemming Run
-    $('form.stemming button').click(function() {
-        form_id = $(this).closest('form').attr('id');
-        form_class = $(this).closest('form').attr('class').split(' ').pop();;
-        basic_running(form_id, form_class);
-
-    });
-
-
 
     function correct_address_node_names(address) {
         return address.replace('media/result/', '').replace('stop_word', 'stopword_removed').replace('/', '_').concat('_output');
@@ -860,45 +794,112 @@ instance.bind("ready", function() {
 
         });
     }
-    // export Run
-    $('form.export_file button').click(function() {
 
-        // alert(instance.getConnections()[0]);
+
+    $('form button').click(function() {
+
         form_id = $(this).closest('form').attr('id');
-        current_state = get_node_info_field(form_id, 'state');
-        if (current_state != 'Created') {
-            form_class = 'export_file';
-            form_selector = 'form#'.concat(form_id);
-            source_address = get_node_info_field(form_id, 'source_address');
+        form_class = $(this).closest('form').attr('class').split(' ').pop();;
+        temp = ['export_file', 'import_collection'];
+
+        if (!temp.includes(form_class)) {
+
+            basic_running(form_id, form_class);
+
+            // import collection running
+        } else if (form_class == 'import_collection') {
 
 
-            fields = APIs[form_class].fields;
-            url = host + APIs[form_class].url;
-            formData = make_formData(form_id, fields);
+            // chceck duplicate connection at binding
+            //  var con = info.connection;
+            //  var arr = jsPlumb.select({ source: con.sourceId, target: con.targetId });
+            //  if (arr.length > 1) {
+            //      jsPlumb.detach(con);
+            //  }
 
-            // alert($('#FilUploader')[0].files[0]);
-            $.ajax({
-                //  url: "https://localhost:8000/api/export/",
-                url: host + export_file_api.url,
-                data: formData,
-                type: 'POST',
-                contentType: false,
-                processData: false,
-            }).done(function(res) {
-                file_src = host + res;
-                download_file(file_src, form_id, source_address);
 
-            }).fail(function(res) {
-                update_controll_color(form_id, StateColor.Failed);
-                update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
-            });
-        } else {
-            alert('Source address is not defined!');
+            form_id = $(this).closest('form').attr('id');
+            file_uploader_selector = '#' + form_id.concat(' #FilUploader');
+            file_uploader = $(file_uploader_selector)[0];
+
+
+
+            //  var connected = instance.getConnections();
+            //  var conn = jsPlumb.select({ source: form_id });
+            //  alert(conn[0].id);
+            //  //  alert(connected[0].source.id);
+            //  $.each(connected, function(e, s) {
+            //      //connection repaint
+            //      s.repaint();
+
+            //      //  alert(s.source.id);
+            //      //  alert(s.target.id);
+            //  });
+
+            var numFiles = file_uploader.files ? file_uploader.files.length : 1;
+            if (numFiles < 1) {
+                alert('Import a collection!');
+            } else {
+                text_input_selector = '#' + form_id.concat(' #text-input');
+                var formData = new FormData();
+                file_name = $(text_input_selector).val();
+
+
+                source_form_selector = 'form#'.concat(form_id);;
+                source_collection_selector = source_form_selector.concat(' .meta-data p.source_collection');
+                //  alert($(source_form_selector).attr('id'));
+
+                $(source_collection_selector).text(file_name);
+                formData.append('name', file_name); //این فیلد را می توانی حذف کنی
+                formData.append('file', file_uploader.files[0]);
+                url = host + 'api/import/';
+                // alert(file_uploader[0].files[0]);
+                send_request(formData, url, form_id, 'import_collection');
+            }
+
+        } else if (form_class == 'export_file') {
+
+            // alert(instance.getConnections()[0]);
+            form_id = $(this).closest('form').attr('id');
+            current_state = get_node_info_field(form_id, 'state');
+            if (current_state != 'Created') {
+                form_class = 'export_file';
+                form_selector = 'form#'.concat(form_id);
+                source_address = get_node_info_field(form_id, 'source_address');
+
+
+                fields = APIs[form_class].fields;
+                url = host + APIs[form_class].url;
+                formData = make_formData(form_id, fields);
+
+                // alert($('#FilUploader')[0].files[0]);
+                $.ajax({
+                    //  url: "https://localhost:8000/api/export/",
+                    url: host + export_file_api.url,
+                    data: formData,
+                    type: 'POST',
+                    contentType: false,
+                    processData: false,
+                }).done(function(res) {
+                    file_src = host + res;
+                    download_file(file_src, form_id, source_address);
+
+                }).fail(function(res) {
+                    update_controll_color(form_id, StateColor.Failed);
+                    update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
+                });
+            } else {
+                alert('Source address is not defined!');
+            }
+
+
+
         }
 
+    })
 
-    });
 
+    // export Run
 
 
 });
