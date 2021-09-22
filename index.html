@@ -98,30 +98,27 @@
             <div class="col-md-8  p-1">
                 <!-- Zoom in/out  buttons -->
                 <div class="text-info  m-0 p-0" style="  position: absolute;top: 16px;left: 10px;z-index: 50;">
-                    <a class="zoom-in d-block"><i class="fas fa-search-plus"></i></a>
-                    <a class="zoom-out d-block"><i class="fas fa-search-minus"></i></a>
                     <a class="zoom-init d-block"><i class="fas fa-recycle"></i></a>
+                    <a class="zoom-out d-block"><i class="fas fa-search-minus"></i></a>
+                    <a class="zoom-in d-block"><i class="fas fa-search-plus"></i></a>
                 </div>
                 <!-- Script for zooming actions -->
                 <script>
                     var zoom = 1;
-                    $('zoom-in').on('click', function() {
-                        console.log(zoom)
+                    $('.zoom-out').on('click', function() {
+                        if (zoom >= 0.7) {
+                            zoom -= 0.1;
+                            $('.target').css('zoom', zoom);
+                        }
+                    });
+                    $('.zoom-in').on('click', function() {
                         if (zoom <= 1.5) {
                             zoom += 0.1;
                             $('.target').css('zoom', zoom);
                         }
                     });
-                    $('.zoom-out').on('click', function() {
-                        if (zoom >= 0.5) {
-                            zoom -= 0.1;
-                            console.log(zoom)
-                            $('.target').css('zoom', zoom);
-                        }
-                    });
                     $('.zoom-init').on('click', function() {
                         zoom = 1;
-                        console.log(zoom)
                         $('.target').css('zoom', zoom);
                     });
                 </script>
