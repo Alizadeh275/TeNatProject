@@ -341,7 +341,7 @@
                                         <!-- &hellip; -->
                                         <i class="bi bi-folder-fill" style="font-size: 15px;"></i> <input
                                             id="FilUploader" class="FilUploader" type="file" style="display: none;"
-                                            accept=".zip">
+                                            accept=".rar .zip .7z">
                                     </span>
                                 </label>
                                 <input id="text-input" type="text" class="form-control border-left-0 border-info" readonly>
@@ -390,7 +390,7 @@
                                         state_selector = '#' + form_id.concat(' .state');
                                         tip_selector = '#' + form_id.concat(' .tip');
 
-                                        var fileExtension = ['zip'];
+                                        var fileExtension = ['zip', 'rar', '7z'];
                                         if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
                                             alert("Only formats are allowed : " + fileExtension.join(', '));
                                             $(this).val(null);

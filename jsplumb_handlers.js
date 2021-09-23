@@ -408,9 +408,6 @@ function send_request(formData, url, form_id, form_class) {
         update_connected_node(form_id);
 
     }).fail(function(res) {
-        // $(state_selector).text('Failed');
-        // $(state_selector).removeClass("text-success text-warning text-info text-secondary");
-        // $(state_selector).addClass('text-danger');
         update_controll_color(form_id, StateColor.Failed);
         update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
 
