@@ -6,8 +6,7 @@
     - JsPlumb Actions
     - Runing Action
 **************************************************************
-% JsPlumb Actions:
-In this file we hand all actions in the workspase page
+In this file we handle all actions in the workspase page
 The actions divide into two category:
 1. jsPlumb actions:
     - drag a node from nodes segment
@@ -25,8 +24,8 @@ The actions divide into two category:
 
 /*----------------------  Variables  ------------------------- */
 
-// var host = 'http://localhost:8000/';
-var host = 'https://tenat.pythonanywhere.com/';
+var host = 'http://localhost:8000/';
+// var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
 instance.setContainer("workspace");
 
@@ -63,7 +62,7 @@ stopword_removal_api_fields = { name: 'file_name', from: 'source_address', langu
 doc_statistics_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
 export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
-tf_idf_api_fields = { name: 'file_name', from: 'source_address', tf: 'tf', idf: 'idf' };
+tf_idf_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
 graph_creation_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
 
 
@@ -184,11 +183,13 @@ function check_connection(source_node, target_node) {
         return true;
     } else if (source_node == 'Stopword_Removal' && (target_node == 'Stemming' || target_node == 'Export_File' || target_node == 'Doc_Statistics')) {
         return true;
-    } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'STW_Removal' || source_node == 'Doc_Statistics')) {
+    } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal' || source_node == 'Doc_Statistics')) {
         return true;
-    } else if (target_node == 'Graph_Creation' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'STW_Removal')) {
+    } else if (target_node == 'Graph_Creation' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
         return true;
     } else if (source_node == 'Graph_Creation' && (target_node == 'Graph_Viewer' || target_node == 'Export_File')) {
+        return true;
+    } else if (target_node == 'TF_IDF' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
         return true;
     } else return false;
 
@@ -281,7 +282,7 @@ function get_node_info_field(form_id, field) {
         field_value = $(field_selector).find(":selected").val();
         return field_value;
 
-    } else if (field == 'mingraph_type_sim') {
+    } else if (field == 'graph_type') {
 
         field_selector = form_selector + ' select#graph_type';
         field_value = $(field_selector).find(":selected").val();
@@ -383,6 +384,9 @@ function send_request(formData, url, form_id, form_class) {
 
                 } else if (form_class == 'graph_creation') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.source + '</td>' + '<td class="col-6">' + value.target + '</td>' + '<td class="col-2">' + value.sim + '</td>' + '</tr>');
+
+                } else if (form_class == 'tf_idf') {
+                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-5">' + value.term + '</td>' + '<td class="col-6">' + value.weight + '</td>' + '</tr>');
 
                 }
             } else {
