@@ -76,7 +76,7 @@
                     <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="position: sticky; top: 0; z-index: 1;font-size: 12px;">Nodes</p>
                     <div class="p-1 w-100 text-light bg-info"> Import/Export Data</div>
                     <div id='Import_Collection' class="control import border-secondary"><i class="bi bi-file-earmark-zip-fill text-secondary"></i> Import Collection</div>
-                    <div id='Import_Document' class="control import border-secondary"><i class="bi bi-file-text-fill mr-0 text-secondary"></i> Import Document</div>
+                    <!-- <div id='Import_Document' class="control import border-secondary"><i class="bi bi-file-text-fill mr-0 text-secondary"></i> Import Document</div> -->
                     <div id='Export_File' class="control export border-secondary"><i class="bi bi-file-earmark-arrow-up-fill mr-0 text-secondary"></i> Export File</div>
 
                     <div class="p-1 w-100 text-light bg-info"> Basic Analysis</div>
@@ -892,11 +892,10 @@
 
                         <div class="form-group px-1">
 
-                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Type:</label>
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Similarity Measure:</label>
                             <select id="graph_type" class="form-control pl-0 mt-0">
-                                <option value="co-occurence" selected>co-occurence</option>
-                                <option value="bi-gram">bi-gram</option>
-            <option value="tri-gram">tri-gram</option>
+                                <option value="Jaccard" selected>Jaccard</option>
+                                <option value="LSI">LSI</option>
                             </select>
 
 
