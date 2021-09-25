@@ -69,10 +69,58 @@
 
     <!-- Main container including one row with three columns (nodes toolbox,(workspace, preview), info toolbox) in that -->
     <div class="container-fluid">
+
+        <!-- Large modal -->
+        <button type="button" id="modal-button" class="btn btn-primary d-none" data-toggle="modal" data-target=".bd-example-modal-lg">Large modal</button>
+
+        <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+                    </div>
+                    <div class="modal-body">
+                        ...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
         <div class="row">
+
+            <nav class="navbar navbar-expand-lg navbar-light bg-light w-100 mb-0 py-0">
+                <a class="navbar-brand text-info" style="  font-family: 'Brush Script MT', cursive;" href="#">Teenat</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link disabled " href="#">home <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled " href="#">new</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">help</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </nav>
+
             <!-- First Column: nodes toolbox -->
-            <div class="col-md-2 p-1">
-                <div id="toolbox" class="p-0 justify-content-center" style="overflow: scroll;">
+            <div class="col-md-2 p-1 pt-0 mt-0">
+                <div id="toolbox" class="p-0 justify-content-center mt-0" style="overflow: scroll;">
                     <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="position: sticky; top: 0; z-index: 1;font-size: 12px;">Nodes</p>
                     <div class="p-1 w-100 text-light bg-info"> Import/Export Data</div>
                     <div id='Import_Collection' class="control import border-secondary"><i class="bi bi-file-earmark-zip-fill text-secondary"></i> Import Collection</div>
@@ -95,9 +143,9 @@
             </div>
 
             <!-- Second Columns: workspace & preview -->
-            <div class="col-md-8  p-1">
+            <div class="col-md-8  p-1 mt-0">
                 <!-- Zoom in/out  buttons -->
-                <div class="text-info  m-0 p-0" style="  position: absolute;top: 16px;left: 10px;z-index: 50;">
+                <div class="text-info  m-0 p-0" style="  position: absolute;top: 5px;left: 10px;z-index: 50;">
                     <a class="zoom d-block"><i class="fas fa-search-plus"></i></a>
                     <a class="zoom-out d-block"><i class="fas fa-search-minus"></i></a>
                     <a class="zoom-init d-block"><i class="fas fa-recycle"></i></a>
@@ -127,7 +175,7 @@
                 </script>
 
                 <!-- workspace -->
-                <div id="workspace" class="zoom box target">
+                <div id="workspace" class="zoom box target mt-0">
                     <!-- <div id="control1" class="control" style="left: 50px; top: 50px"><i class="bi bi-file-earmark-arrow-down-fill mr-1 text-success"></i> Import Data</div>
                         <div id="control2" class="control" style="left: 300px; top: 200px"> <i class="bi bi-file-earmark-arrow-up-fill mr-1 text-success"></i>Export Data</div> -->
                 </div>
@@ -318,7 +366,7 @@
 
             <!-- third column: node info toolbox -->
             <div class="col-md-2  p-1">
-                <div class="right_toolbox p-0 justify-content-center" id="toolbox" style="overflow: scroll;">
+                <div class="right_toolbox p-0 justify-content-center mt-0" id="toolbox" style="overflow: scroll;">
 
                     <!-- Import Collection -->
                     <form class="my-form-control d-none import_collection" id="Import_Collection">
@@ -958,6 +1006,85 @@
 
                         </div>
                     </form>
+
+
+
+
+
+
+                    <!-- ====================================================== -->
+                    <!-- Graph_Viewer -->
+
+                    <form class="my-form-control d-none w-100 graph_viewer" id="Graph_Viewer">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Graph Viewer</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Color:</label>
+                            <select id="graph_type" class="form-control pl-0 mt-0">
+                                <option value="Red" selected>Red</option>
+                                <option value="Blue">Blue</option>
+                            </select>
+
+
+
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
+
+
+
+
 
 
 

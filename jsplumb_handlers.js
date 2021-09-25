@@ -64,6 +64,7 @@ stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'la
 export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
 tf_idf_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 graph_creation_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
+graph_viewer_api_fields = { name: 'file_name', from: 'source_address' };
 
 
 // api object
@@ -79,6 +80,7 @@ let stemming_api = { name: 'stemming', url: 'api/stem/', fields: stemming_api_fi
 let export_file_api = { name: 'export_file', url: 'api/export/', fields: export_file_api_fields }
 let tf_idf_api = { name: 'tf_idf', url: 'api/tf-idf/', fields: tf_idf_api_fields }
 let graph_creation_api = { name: 'graph_creation', url: 'api/graph-construction/', fields: graph_creation_api_fields }
+let graph_viewer_api = { name: 'graph_viewr', url: 'api/graph-viewer/', fields: graph_creation_api_fields }
 
 // api arrays
 const APIs = {
@@ -90,6 +92,7 @@ const APIs = {
     export_file: export_file_api,
     tf_idf: tf_idf_api,
     graph_creation: graph_creation_api,
+    graph_viewer: graph_viewer_api,
 
 }
 
@@ -177,7 +180,7 @@ function check_connection(source_node, target_node) {
     if (source_node == 'Import_Collection' &&
         (target_node == 'Tokenization')) {
         return true;
-    } else if (source_node == 'Tokenization' && (target_node != 'Tokenization')) {
+    } else if (source_node == 'Tokenization' && (target_node != 'Tokenization') && (target_node != 'Graph_Viewer')) {
         return true;
     } else if (source_node == 'Stemming' && (target_node == 'Export_File' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics')) {
         return true;
@@ -430,10 +433,13 @@ function basic_running(form_id, form_class) {
         url = host + APIs[form_class].url;
         formData = make_formData(form_id, fields);
         send_request(formData, url, form_id, form_class);
+
     } else { // try to set source_address
         alert('Source address is not defined!');
     }
-
+    if (form_class == 'graph_viewer') {
+        $('#modal-button').click();
+    }
 
 
 }
