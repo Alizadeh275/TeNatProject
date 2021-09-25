@@ -62,7 +62,7 @@ stopword_removal_api_fields = { name: 'file_name', from: 'source_address', langu
 doc_statistics_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
 export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
-tf_idf_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
+tf_idf_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 graph_creation_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
 
 
@@ -386,7 +386,13 @@ function send_request(formData, url, form_id, form_class) {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.source + '</td>' + '<td class="col-6">' + value.target + '</td>' + '<td class="col-2">' + value.sim + '</td>' + '</tr>');
 
                 } else if (form_class == 'tf_idf') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-5">' + value.term + '</td>' + '<td class="col-6">' + value.weight + '</td>' + '</tr>');
+
+                    // tf_idf = '';
+                    // $.each(value.tf_idf, function(index, value) {
+                    //     tf_idf += value.doc + ': ' + value.weight + ', '
+                    // });
+
+                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.term + '</td>' + '<td class="col-4">' + value.doc + '</td>' + '<td class="col-2">' + value.weight + '</td>' + '</tr>');
 
                 }
             } else {
