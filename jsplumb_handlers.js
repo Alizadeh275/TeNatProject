@@ -63,7 +63,7 @@ stopword_removal_api_fields = { name: 'file_name', from: 'source_address', langu
 doc_statistics_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
 export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
-tf_idf_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
+tf_idf_api_fields = { name: 'file_name', from: 'source_address', method: 'algorithm' };
 graph_creation_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
 graph_viewer_api_fields = { name: 'file_name', from: 'source_address' };
 
