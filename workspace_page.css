@@ -236,3 +236,8 @@ button i {
         transform: rotate(360deg);
     }
 }
+
+.anychart-credits-text,
+.anychart-credits-logo {
+    display: none;
+}

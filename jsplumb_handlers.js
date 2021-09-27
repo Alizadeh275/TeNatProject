@@ -27,6 +27,7 @@ The actions divide into two category:
 var host = 'http://localhost:8000/';
 // var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
+let grapn_viewer_data = {}
 instance.setContainer("workspace");
 
 
@@ -300,6 +301,9 @@ function get_node_info_field(form_id, field) {
     } else if (field == 'source_node') {
         p_selector = ' .meta-data p.source_node';
 
+    } else if (field == 'source_id') {
+        p_selector = ' .meta-data p.source_id';
+
     } else if (field == 'source_address') {
         p_selector = ' .meta-data p.source_address';
 
@@ -390,16 +394,12 @@ function send_request(formData, url, form_id, form_class) {
 
                 } else if (form_class == 'tf_idf') {
 
-                    // tf_idf = '';
-                    // $.each(value.tf_idf, function(index, value) {
-                    //     tf_idf += value.doc + ': ' + value.weight + ', '
-                    // });
-
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.term + '</td>' + '<td class="col-4">' + value.doc + '</td>' + '<td class="col-2">' + value.weight + '</td>' + '</tr>');
+
+                } else if (form_class == 'graph_viewer') {
 
                 }
             } else {
-
                 current_address = value.file_name;
                 if (typeof(value.output_path) != 'undefined') {
                     current_address = value.output_path;
@@ -415,6 +415,7 @@ function send_request(formData, url, form_id, form_class) {
         update_controll_color(form_id, StateColor.Completed);
         update_meta_data(form_selector, 'default', 'default', 'default', 'default', current_address, StateColor.Completed, '');
         update_connected_node(form_id);
+
 
     }).fail(function(res) {
         update_controll_color(form_id, StateColor.Failed);
@@ -437,9 +438,7 @@ function basic_running(form_id, form_class) {
     } else { // try to set source_address
         alert('Source address is not defined!');
     }
-    if (form_class == 'graph_viewer') {
-        $('#modal-button').click();
-    }
+    if (form_class == 'graph_viewer') {}
 
 
 }
@@ -813,7 +812,7 @@ instance.bind("ready", function() {
 
         form_id = $(this).closest('form').attr('id');
         form_class = $(this).closest('form').attr('class').split(' ').pop();;
-        temp = ['export_file', 'import_collection'];
+        temp = ['export_file', 'import_collection', 'graph_viewer'];
 
         if (!temp.includes(form_class)) {
 
@@ -906,6 +905,73 @@ instance.bind("ready", function() {
             }
 
 
+
+        } else if (form_class == 'graph_viewer') {
+            // alert(instance.getConnections()[0]);
+            form_id = $(this).closest('form').attr('id');
+            current_state = get_node_info_field(form_id, 'state');
+            if (current_state != 'Created') {
+                form_class = 'graph_viewer';
+                form_selector = 'form#'.concat(form_id);
+                source_address = get_node_info_field(form_id, 'source_address');
+                source_collection = get_node_info_field(form_id, 'file_name');
+
+
+                fields = APIs[form_class].fields;
+                url = host + APIs[form_class].url;
+                formData = make_formData(form_id, fields);
+
+                // alert($('#FilUploader')[0].files[0]);
+                $.ajax({
+                    //  url: "https://localhost:8000/api/export/",
+                    url: host + graph_viewer_api.url,
+                    data: formData,
+                    type: 'POST',
+                    contentType: false,
+                    processData: false,
+                }).done(function(res) {
+
+                    anychart.onDocumentReady(function() {
+                        // alert('data');
+                        $('#graph-container').empty();
+                        // create data
+                        var data = res;
+                        // create a chart and set the data
+                        // alert(data.nodes[0]);
+                        var chart = anychart.graph(data);
+
+                        // prevent zooming the chart with the mouse wheel
+                        chart.interactivity().zoomOnMouseWheel(true);
+
+                        source_form_id = 'Graph_Creation-' + get_node_info_field(form_id, 'source_id');
+                        min_sim = get_node_info_field(source_form_id, 'min_sim')
+
+                        // set the chart title
+                        chart.title("Minimum Similarity: " + min_sim);
+
+                        // set the container id
+                        chart.container("graph-container");
+                        var nodes = chart.nodes();
+
+                        // set the size of nodes
+                        nodes.normal().height(20);
+                        nodes.hovered().height(30);
+                        nodes.selected().height(3);
+                        // initiate drawing the chart
+                        chart.draw();
+                    });
+                    $('#modal-button').click();
+
+                    update_controll_color(form_id, StateColor.Completed);
+                    update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Completed, '');
+                    source_address = get_node_info_field(form_id, 'source_address');
+                    $('#exampleModalLabel').text(source_collection);
+                }).fail(function(res) {
+
+                });
+            } else {
+                alert('Source address is not defined!');
+            }
 
         }
 

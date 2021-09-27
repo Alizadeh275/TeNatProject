@@ -20,7 +20,14 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="workspace_page.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
-    <script src="jquery.blockUI.js">
+    <script src="jquery.blockUI.js"></script>
+
+
+    <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-graph.min.js"></script>
+
+    <!-- Include from the CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js">
     </script>
     <!-- Script for logging every ajax request  -->
     <script>
@@ -75,19 +82,48 @@
 
         <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
+                <div class="modal-content" style="height: 600px;">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <h5 class="modal-title" id="exampleModalLabel"></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
                     </div>
-                    <div class="modal-body">
-                        ...
+                    <div class="modal-body" id="snapshot">
+                        <div id="graph-container" class="w-100 h-100 p-1 border">
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save</button>
+                        <button id="save_graph_view" onclick="takeshot()" type="button" class="btn btn-info">Save</button>
+                        <div id="output" class="d-none"></div>
+
+                        <script type="text/javascript">
+                            // Define the function 
+                            // to screenshot the div
+                            function takeshot() {
+                                let div =
+                                    document.getElementById('snapshot');
+
+                                // Use the html2canvas
+                                // function to take a screenshot
+                                // and append it
+                                // to the output div
+                                html2canvas(div).then(
+                                    function(canvas) {
+                                        document
+                                            .getElementById('output')
+                                            .appendChild(canvas);
+
+                                        var a = document.createElement('a');
+                                        // toDataURL defaults to png, so we need to request a jpeg, then convert for file download.
+                                        a.href = canvas.toDataURL("image/jpeg").replace("image/jpeg", "image/octet-stream");
+                                        a.download = 'graph.png';
+                                        a.click();
+
+                                    })
+                            }
+                        </script>
                     </div>
                 </div>
             </div>
@@ -102,16 +138,16 @@
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="collapse navbar-collapse py-0" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link disabled " href="#">home <span class="sr-only">(current)</span></a>
+                            <a class="nav-link disabled " href="#">Home <span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled " href="#">new</a>
+                            <a class="nav-link disabled " href="#">File</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" href="#">help</a>
+                            <a class="nav-link disabled" href="#">Help</a>
                         </li>
 
                     </ul>
@@ -1028,9 +1064,9 @@
 
                         <div class="form-group px-1">
 
-                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Color:</label>
-                            <select id="graph_type" class="form-control pl-0 mt-0">
-                                <option value="Red" selected>Red</option>
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Data:</label>
+                            <select id="graph_type" class="form-control pl-0 mt-0" disabled>
+                                <option value="Red" selected>__data__</option>
                                 <option value="Blue">Blue</option>
                             </select>
 
@@ -1075,7 +1111,10 @@
                                 <label class="text-secondary w-100">Tip:</label>
                                 <p class=" mb-1 tip"></p>
                             </div>
-
+                            <div class="row mt-1 border-bottom px-1 d-none">
+                                <label class="text-secondary w-100">data:</label>
+                                <p id="graph_data" class=" mb-1 graph_data"></p>
+                            </div>
 
 
                         </div>
