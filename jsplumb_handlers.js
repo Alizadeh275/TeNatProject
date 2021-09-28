@@ -6,8 +6,7 @@
     - JsPlumb Actions
     - Runing Action
 **************************************************************
-% JsPlumb Actions:
-In this file we hand all actions in the workspase page
+In this file we handle all actions in the workspase page
 The actions divide into two category:
 1. jsPlumb actions:
     - drag a node from nodes segment
@@ -28,6 +27,7 @@ The actions divide into two category:
 // var host = 'http://localhost:8000/';
 var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
+let grapn_viewer_data = {}
 instance.setContainer("workspace");
 
 
@@ -63,8 +63,9 @@ stopword_removal_api_fields = { name: 'file_name', from: 'source_address', langu
 doc_statistics_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
 export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
-tf_idf_api_fields = { name: 'file_name', from: 'source_address', tf: 'tf', idf: 'idf' };
-graph_creation_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
+tf_idf_api_fields = { name: 'file_name', from: 'source_address', method: 'algorithm' };
+graph_construction_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
+graph_viewer_api_fields = { name: 'file_name', from: 'source_address' };
 
 
 // api object
@@ -79,7 +80,8 @@ let doc_statistics_api = { name: 'doc_statistics', url: 'api/doc-statistics/', f
 let stemming_api = { name: 'stemming', url: 'api/stem/', fields: stemming_api_fields }
 let export_file_api = { name: 'export_file', url: 'api/export/', fields: export_file_api_fields }
 let tf_idf_api = { name: 'tf_idf', url: 'api/tf-idf/', fields: tf_idf_api_fields }
-let graph_creation_api = { name: 'graph_creation', url: 'api/graph-construction/', fields: graph_creation_api_fields }
+let graph_construction_api = { name: 'graph_construction', url: 'api/graph-construction/', fields: graph_construction_api_fields }
+let graph_viewer_api = { name: 'graph_viewr', url: 'api/graph-viewer/', fields: graph_construction_api_fields }
 
 // api arrays
 const APIs = {
@@ -90,7 +92,8 @@ const APIs = {
     stemming: stemming_api,
     export_file: export_file_api,
     tf_idf: tf_idf_api,
-    graph_creation: graph_creation_api,
+    graph_construction: graph_construction_api,
+    graph_viewer: graph_viewer_api,
 
 }
 
@@ -178,17 +181,19 @@ function check_connection(source_node, target_node) {
     if (source_node == 'Import_Collection' &&
         (target_node == 'Tokenization')) {
         return true;
-    } else if (source_node == 'Tokenization' && (target_node != 'Tokenization')) {
+    } else if (source_node == 'Tokenization' && (target_node != 'Tokenization') && (target_node != 'Graph_Viewer')) {
         return true;
     } else if (source_node == 'Stemming' && (target_node == 'Export_File' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics')) {
         return true;
     } else if (source_node == 'Stopword_Removal' && (target_node == 'Stemming' || target_node == 'Export_File' || target_node == 'Doc_Statistics')) {
         return true;
-    } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'STW_Removal' || source_node == 'Doc_Statistics')) {
+    } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal' || source_node == 'Doc_Statistics')) {
         return true;
-    } else if (target_node == 'Graph_Creation' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'STW_Removal')) {
+    } else if (target_node == 'Graph_Construction' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
         return true;
-    } else if (source_node == 'Graph_Creation' && (target_node == 'Graph_Viewer' || target_node == 'Export_File')) {
+    } else if (source_node == 'Graph_Construction' && (target_node == 'Graph_Viewer' || target_node == 'Export_File')) {
+        return true;
+    } else if (target_node == 'TF_IDF' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
         return true;
     } else return false;
 
@@ -281,7 +286,7 @@ function get_node_info_field(form_id, field) {
         field_value = $(field_selector).find(":selected").val();
         return field_value;
 
-    } else if (field == 'mingraph_type_sim') {
+    } else if (field == 'graph_type') {
 
         field_selector = form_selector + ' select#graph_type';
         field_value = $(field_selector).find(":selected").val();
@@ -295,6 +300,9 @@ function get_node_info_field(form_id, field) {
 
     } else if (field == 'source_node') {
         p_selector = ' .meta-data p.source_node';
+
+    } else if (field == 'source_id') {
+        p_selector = ' .meta-data p.source_id';
 
     } else if (field == 'source_address') {
         p_selector = ' .meta-data p.source_address';
@@ -381,12 +389,17 @@ function send_request(formData, url, form_id, form_class) {
                 } else if (form_class == 'stemming') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
 
-                } else if (form_class == 'graph_creation') {
+                } else if (form_class == 'graph_construction') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.source + '</td>' + '<td class="col-6">' + value.target + '</td>' + '<td class="col-2">' + value.sim + '</td>' + '</tr>');
+
+                } else if (form_class == 'tf_idf') {
+
+                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.term + '</td>' + '<td class="col-4">' + value.doc + '</td>' + '<td class="col-2">' + value.weight + '</td>' + '</tr>');
+
+                } else if (form_class == 'graph_viewer') {
 
                 }
             } else {
-
                 current_address = value.file_name;
                 if (typeof(value.output_path) != 'undefined') {
                     current_address = value.output_path;
@@ -403,10 +416,8 @@ function send_request(formData, url, form_id, form_class) {
         update_meta_data(form_selector, 'default', 'default', 'default', 'default', current_address, StateColor.Completed, '');
         update_connected_node(form_id);
 
+
     }).fail(function(res) {
-        // $(state_selector).text('Failed');
-        // $(state_selector).removeClass("text-success text-warning text-info text-secondary");
-        // $(state_selector).addClass('text-danger');
         update_controll_color(form_id, StateColor.Failed);
         update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
 
@@ -423,10 +434,11 @@ function basic_running(form_id, form_class) {
         url = host + APIs[form_class].url;
         formData = make_formData(form_id, fields);
         send_request(formData, url, form_id, form_class);
+
     } else { // try to set source_address
         alert('Source address is not defined!');
     }
-
+    if (form_class == 'graph_viewer') {}
 
 
 }
@@ -800,7 +812,7 @@ instance.bind("ready", function() {
 
         form_id = $(this).closest('form').attr('id');
         form_class = $(this).closest('form').attr('class').split(' ').pop();;
-        temp = ['export_file', 'import_collection'];
+        temp = ['export_file', 'import_collection', 'graph_viewer'];
 
         if (!temp.includes(form_class)) {
 
@@ -893,6 +905,73 @@ instance.bind("ready", function() {
             }
 
 
+
+        } else if (form_class == 'graph_viewer') {
+            // alert(instance.getConnections()[0]);
+            form_id = $(this).closest('form').attr('id');
+            current_state = get_node_info_field(form_id, 'state');
+            if (current_state != 'Created') {
+                form_class = 'graph_viewer';
+                form_selector = 'form#'.concat(form_id);
+                source_address = get_node_info_field(form_id, 'source_address');
+                source_collection = get_node_info_field(form_id, 'file_name');
+
+
+                fields = APIs[form_class].fields;
+                url = host + APIs[form_class].url;
+                formData = make_formData(form_id, fields);
+
+                // alert($('#FilUploader')[0].files[0]);
+                $.ajax({
+                    //  url: "https://localhost:8000/api/export/",
+                    url: host + graph_viewer_api.url,
+                    data: formData,
+                    type: 'POST',
+                    contentType: false,
+                    processData: false,
+                }).done(function(res) {
+
+                    anychart.onDocumentReady(function() {
+                        // alert('data');
+                        $('#graph-container').empty();
+                        // create data
+                        var data = res;
+                        // create a chart and set the data
+                        // alert(data.nodes[0]);
+                        var chart = anychart.graph(data);
+
+                        // prevent zooming the chart with the mouse wheel
+                        chart.interactivity().zoomOnMouseWheel(true);
+
+                        source_form_id = 'Graph_Construction-' + get_node_info_field(form_id, 'source_id');
+                        min_sim = get_node_info_field(source_form_id, 'min_sim')
+
+                        // set the chart title
+                        chart.title("Minimum Similarity: " + min_sim);
+
+                        // set the container id
+                        chart.container("graph-container");
+                        var nodes = chart.nodes();
+
+                        // set the size of nodes
+                        nodes.normal().height(20);
+                        nodes.hovered().height(30);
+                        nodes.selected().height(3);
+                        // initiate drawing the chart
+                        chart.draw();
+                    });
+                    $('#modal-button').click();
+
+                    update_controll_color(form_id, StateColor.Completed);
+                    update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Completed, '');
+                    source_address = get_node_info_field(form_id, 'source_address');
+                    $('#exampleModalLabel').text(source_collection);
+                }).fail(function(res) {
+
+                });
+            } else {
+                alert('Source address is not defined!');
+            }
 
         }
 
