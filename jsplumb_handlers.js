@@ -64,7 +64,7 @@ doc_statistics_api_fields = { name: 'file_name', from: 'source_address', languag
 stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
 export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
 tf_idf_api_fields = { name: 'file_name', from: 'source_address', method: 'algorithm' };
-graph_creation_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
+graph_construction_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
 graph_viewer_api_fields = { name: 'file_name', from: 'source_address' };
 
 
@@ -80,8 +80,8 @@ let doc_statistics_api = { name: 'doc_statistics', url: 'api/doc-statistics/', f
 let stemming_api = { name: 'stemming', url: 'api/stem/', fields: stemming_api_fields }
 let export_file_api = { name: 'export_file', url: 'api/export/', fields: export_file_api_fields }
 let tf_idf_api = { name: 'tf_idf', url: 'api/tf-idf/', fields: tf_idf_api_fields }
-let graph_creation_api = { name: 'graph_creation', url: 'api/graph-construction/', fields: graph_creation_api_fields }
-let graph_viewer_api = { name: 'graph_viewr', url: 'api/graph-viewer/', fields: graph_creation_api_fields }
+let graph_construction_api = { name: 'graph_construction', url: 'api/graph-construction/', fields: graph_construction_api_fields }
+let graph_viewer_api = { name: 'graph_viewr', url: 'api/graph-viewer/', fields: graph_construction_api_fields }
 
 // api arrays
 const APIs = {
@@ -92,7 +92,7 @@ const APIs = {
     stemming: stemming_api,
     export_file: export_file_api,
     tf_idf: tf_idf_api,
-    graph_creation: graph_creation_api,
+    graph_construction: graph_construction_api,
     graph_viewer: graph_viewer_api,
 
 }
@@ -189,9 +189,9 @@ function check_connection(source_node, target_node) {
         return true;
     } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal' || source_node == 'Doc_Statistics')) {
         return true;
-    } else if (target_node == 'Graph_Creation' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
+    } else if (target_node == 'Graph_Construction' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
         return true;
-    } else if (source_node == 'Graph_Creation' && (target_node == 'Graph_Viewer' || target_node == 'Export_File')) {
+    } else if (source_node == 'Graph_Construction' && (target_node == 'Graph_Viewer' || target_node == 'Export_File')) {
         return true;
     } else if (target_node == 'TF_IDF' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
         return true;
@@ -389,7 +389,7 @@ function send_request(formData, url, form_id, form_class) {
                 } else if (form_class == 'stemming') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
 
-                } else if (form_class == 'graph_creation') {
+                } else if (form_class == 'graph_construction') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.source + '</td>' + '<td class="col-6">' + value.target + '</td>' + '<td class="col-2">' + value.sim + '</td>' + '</tr>');
 
                 } else if (form_class == 'tf_idf') {
@@ -943,7 +943,7 @@ instance.bind("ready", function() {
                         // prevent zooming the chart with the mouse wheel
                         chart.interactivity().zoomOnMouseWheel(true);
 
-                        source_form_id = 'Graph_Creation-' + get_node_info_field(form_id, 'source_id');
+                        source_form_id = 'Graph_Construction-' + get_node_info_field(form_id, 'source_id');
                         min_sim = get_node_info_field(source_form_id, 'min_sim')
 
                         // set the chart title
