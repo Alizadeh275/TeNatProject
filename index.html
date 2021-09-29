@@ -29,6 +29,9 @@
     <!-- Include from the CDN -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js">
     </script>
+
+
+
     <!-- Script for logging every ajax request  -->
     <script>
         $(document).ready(function() {
@@ -1068,10 +1071,24 @@
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Data:</label>
                             <select id="graph_type" class="form-control pl-0 mt-0" disabled>
                                 <option value="Red" selected>__data__</option>
-                                <option value="Blue">Blue</option>
                             </select>
 
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Node Shape:</label>
+                            <select id="node_shape" class="form-control pl-0 mt-0">
+                                <option value="circle" selected>circle</option>
+                                <option value="diamond">diamond</option>
+                                <option value="square">square</option>
+                                <option value="star5">star5</option>
+                            </select>
 
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Node Size:</label>
+                            <select id="node_size" class="form-control pl-0 mt-0">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                                <option value="50">50</option>
+                            </select>
 
 
                         </div>
