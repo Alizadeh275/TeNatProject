@@ -44,12 +44,8 @@
                     // blockUI code with custom 
                     // message and styling
                     message: "<div class='loader'></div>",
-                    css: {
-                        color: 'green',
-                        borderColor: 'green',
-                        border: 0
-                    }
                 });
+                console.log(' block');
             });
 
             $(document).ajaxStop(function() {
@@ -65,6 +61,8 @@
                 // debugger;
                 console.log('ajax complete.');
                 $.unblockUI();
+                console.log(' Unblock');
+
             });
             $(document).ajaxError(function(event, request, settings) {
                 // debugger;

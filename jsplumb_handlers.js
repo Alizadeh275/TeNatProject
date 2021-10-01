@@ -24,8 +24,8 @@ The actions divide into two category:
 
 /*----------------------  Variables  ------------------------- */
 
-// var host = 'http://localhost:8000/';
-var host = 'https://tenat.pythonanywhere.com/';
+var host = 'http://localhost:8000/';
+// var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
 let grapn_viewer_data = {}
 instance.setContainer("workspace");
@@ -187,7 +187,7 @@ function check_connection(source_node, target_node) {
         return true;
     } else if (source_node == 'Stopword_Removal' && (target_node == 'Stemming' || target_node == 'Export_File' || target_node == 'Doc_Statistics')) {
         return true;
-    } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal' || source_node == 'Doc_Statistics')) {
+    } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal' || source_node == 'Doc_Statistics' || source_node == 'TF_IDF')) {
         return true;
     } else if (target_node == 'Graph_Construction' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
         return true;
@@ -298,6 +298,18 @@ function get_node_info_field(form_id, field) {
         field_value = $(field_selector).find(":selected").val();
         return field_value;
 
+    } else if (field == 'node_shape') {
+
+        field_selector = form_selector + ' select#node_shape';
+        field_value = $(field_selector).find(":selected").val();
+        return field_value;
+
+    } else if (field == 'node_size') {
+
+        field_selector = form_selector + ' select#node_size';
+        field_value = $(field_selector).find(":selected").val();
+        return field_value;
+
     } else if (field == 'source_node') {
         p_selector = ' .meta-data p.source_node';
 
@@ -361,13 +373,15 @@ function update_connected_node(form_id) {
 function send_request(formData, url, form_id, form_class) {
     form_selector = 'form#'.concat(form_id);
     let source_address = '';
-
     $.ajax({
         url: url,
         data: formData,
         type: 'POST',
         contentType: false,
-        processData: false
+        processData: false,
+        async: true,
+
+
     }).done(function(res) {
         table_selector = 'table#'.concat(form_id) + ' tbody';
         $(table_selector).children().remove();
@@ -422,24 +436,80 @@ function send_request(formData, url, form_id, form_class) {
         update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
 
     });
+
 }
+
+
+
+// get source node
+function get_source_node(current_node_id) {
+    let source_node = '';
+
+    var connected = instance.getConnections();
+
+    $.each(connected, function(e, s) {
+
+        if (s.target.id == current_node_id) {
+            source_node = s.source.id;
+            // alert(source_node);
+        }
+    });
+    return source_node;
+}
+
+
+
+
+function get_all_previous_nodes(current_node_id) {
+    let previous_nodes = [];
+    let cn = current_node_id;
+
+    let connected = instance.getConnections();
+
+    $.each(connected, function(e, s) {
+        source = get_source_node(cn);
+        if (source != '') {
+            previous_nodes.push(source);
+            cn = source;
+        }
+
+        //  alert(s.source.id);
+    });
+    return previous_nodes.reverse();
+
+}
+
 
 
 // function that runs when click on node run button (expect of import and export)
 function basic_running(form_id, form_class) {
 
-    current_state = get_node_info_field(form_id, 'state');
+    let fid = form_id;
+    current_state = get_node_info_field(fid, 'state');
+
     if (current_state != 'Created') { // source addrss not setted.
         fields = APIs[form_class].fields;
         url = host + APIs[form_class].url;
-        formData = make_formData(form_id, fields);
-        send_request(formData, url, form_id, form_class);
+        formData = make_formData(fid, fields);
+        send_request(formData, url, fid, form_class);
 
     } else { // try to set source_address
-        alert('Source address is not defined!');
-    }
-    if (form_class == 'graph_viewer') {}
+        // alert('Source address is not defined!');
+        source_id = get_source_node(fid);
+        src_state = get_node_info_field(source_id, 'state');
+        if (src_state != 'Completed') {
+            button_selector = 'form#' + source_id + ' button';
+            $(button_selector).click();
+        } else {
+            let form_selector = 'form#' + fid + ' button';
+            $(form_selector).click();
+        }
 
+
+
+
+
+    }
 
 }
 
@@ -807,11 +877,25 @@ instance.bind("ready", function() {
         });
     }
 
+    function get_form_class(form_id) {
+        class_names = ['import_collection', 'tokenization', 'stopword_removal', 'stemming', 'doc_statistics', 'tf_idf', 'graph_construction', 'graph_viewer', 'export_file'];
+        form_selector = 'form#' + form_id;
+        class_name = ''
+        $.each(class_names, function(index, value) {
+            if ($(form_selector).hasClass(value)) {
+                class_name = value;
+            }
+
+        });
+        return class_name;
+    }
+
 
     $('form button').click(function() {
 
         form_id = $(this).closest('form').attr('id');
-        form_class = $(this).closest('form').attr('class').split(' ').pop();;
+        form_class = get_form_class(form_id);
+        // alert(form_class);
         temp = ['export_file', 'import_collection', 'graph_viewer'];
 
         if (!temp.includes(form_class)) {
@@ -901,7 +985,12 @@ instance.bind("ready", function() {
                     update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
                 });
             } else {
-                alert('Source address is not defined!');
+                source_id = get_source_node(form_id);
+                button_selector = 'form#' + source_id + ' button';
+                $(button_selector).click();
+
+                let form_selector = 'form#' + form_id + ' button';
+                $(form_selector).click();
             }
 
 
@@ -945,7 +1034,8 @@ instance.bind("ready", function() {
 
                         source_form_id = 'Graph_Construction-' + get_node_info_field(form_id, 'source_id');
                         min_sim = get_node_info_field(source_form_id, 'min_sim')
-
+                        shape = get_node_info_field(form_id, 'node_shape');
+                        size = parseInt(get_node_info_field(form_id, 'node_size'));
                         // set the chart title
                         chart.title("Minimum Similarity: " + min_sim);
 
@@ -954,9 +1044,10 @@ instance.bind("ready", function() {
                         var nodes = chart.nodes();
 
                         // set the size of nodes
-                        nodes.normal().height(20);
-                        nodes.hovered().height(30);
-                        nodes.selected().height(3);
+                        nodes.normal().shape(shape);
+                        nodes.normal().height(size);
+                        nodes.hovered().height(size + 10);
+                        nodes.selected().height(size + 10);
                         // initiate drawing the chart
                         chart.draw();
                     });
@@ -970,11 +1061,16 @@ instance.bind("ready", function() {
 
                 });
             } else {
-                alert('Source address is not defined!');
-            }
+
+                source_id = get_source_node(form_id);
+                button_selector = 'form#' + source_id + ' button';
+                $(button_selector).click();
+
+                let form_selector = 'form#' + form_id + ' button';
+                $(form_selector).click();
+            } //else
 
         }
-
     })
 
 
