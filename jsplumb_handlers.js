@@ -479,7 +479,34 @@ function get_all_previous_nodes(current_node_id) {
 
 }
 
+function main_run(form_id, form_class) {
 
+
+    let fid = form_id;
+    current_state = get_node_info_field(fid, 'state');
+
+    if (current_state != 'Completed') {
+
+        pn = get_all_previous_nodes(form_id);
+        $.each(pn, function(index, value) {
+            let form_selector = 'form#' + pn;
+            button_selector = form_selector + ' button';
+            if (get_node_info_field(pn, 'state') != 'Completed') {
+                $(button_selector).click();
+            }
+            while (get_node_info_field(pn, 'state') != 'Completed') {};
+
+        });
+        let fid = form_id;
+        current_state = get_node_info_field(fid, 'state');
+
+        fields = APIs[form_class].fields;
+        url = host + APIs[form_class].url;
+        formData = make_formData(fid, fields);
+        send_request(formData, url, fid, form_class);
+    }
+
+}
 
 // function that runs when click on node run button (expect of import and export)
 function basic_running(form_id, form_class) {
@@ -501,11 +528,6 @@ function basic_running(form_id, form_class) {
 
         let form_selector = 'form#' + fid + ' button';
         $(form_selector).click();
-
-
-
-
-
 
     }
 
