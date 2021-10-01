@@ -379,7 +379,7 @@ function send_request(formData, url, form_id, form_class) {
         type: 'POST',
         contentType: false,
         processData: false,
-        async: true,
+        async: false,
 
 
     }).done(function(res) {
@@ -496,14 +496,12 @@ function basic_running(form_id, form_class) {
     } else { // try to set source_address
         // alert('Source address is not defined!');
         source_id = get_source_node(fid);
-        src_state = get_node_info_field(source_id, 'state');
-        if (src_state != 'Completed') {
-            button_selector = 'form#' + source_id + ' button';
-            $(button_selector).click();
-        } else {
-            let form_selector = 'form#' + fid + ' button';
-            $(form_selector).click();
-        }
+        button_selector = 'form#' + source_id + ' button';
+        $(button_selector).click();
+
+        let form_selector = 'form#' + fid + ' button';
+        $(form_selector).click();
+
 
 
 
