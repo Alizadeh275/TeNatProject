@@ -62,25 +62,40 @@ tokenization_api_fields = { name: 'file_name', from: 'source_node', seperator: '
 stopword_removal_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 doc_statistics_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
+lemmatizing_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
 export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
 tf_idf_api_fields = { name: 'file_name', from: 'source_address', method: 'algorithm' };
 graph_construction_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
 graph_viewer_api_fields = { name: 'file_name', from: 'source_address' };
 
+// api targets
+let node_names = ['Import_Collection', 'Tokenization', 'Stopword_Removal', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Graph_Construction', 'Graph_viewer', 'Export_File'];
+
+let import_targets = ['Tokenization'];
+
+let tokenization_targets = node_names.filter(x => !['Tokenization', 'Graph_Viewer'].includes(x));
+let stemming_targets = ['Stopword_Removal', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let lemmatizing_targets = ['Stopword_Removal', 'Stemming', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let stop_word_removal_targets = ['Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let doc_statistics_targets = ['Export_File'];
+let tf_idf_targets = ['Export_File'];
+let graph_construction_targets = ['Export_File', 'Graph_Viewer'];
 
 // api object
-let import_collection_api = { name: 'import_collection', url: 'api/import/', fields: import_collection_api_fields }
-let tokenization_api = { name: 'tokenization', url: 'api/tokenize/', fields: tokenization_api_fields }
+let import_collection_api = { name: 'import_collection', targets: import_targets, url: 'api/import/', fields: import_collection_api_fields }
+let tokenization_api = { name: 'tokenization', targets: tokenization_targets, url: 'api/tokenize/', fields: tokenization_api_fields }
 let stopword_removal_api = {
     name: 'stopword_removal',
+    targets: stop_word_removal_targets,
     url: 'api/stop-word-removal/',
     fields: stopword_removal_api_fields
 }
-let doc_statistics_api = { name: 'doc_statistics', url: 'api/doc-statistics/', fields: doc_statistics_api_fields }
-let stemming_api = { name: 'stemming', url: 'api/stem/', fields: stemming_api_fields }
+let doc_statistics_api = { name: 'doc_statistics', targets: doc_statistics_targets, url: 'api/doc-statistics/', fields: doc_statistics_api_fields }
+let stemming_api = { name: 'stemming', targets: stemming_targets, url: 'api/stem/', fields: stemming_api_fields }
+let lemmatizing_api = { name: 'lemmatizing', targets: lemmatizing_targets, url: 'api/lemmatize/', fields: lemmatizing_api_fields }
 let export_file_api = { name: 'export_file', url: 'api/export/', fields: export_file_api_fields }
-let tf_idf_api = { name: 'tf_idf', url: 'api/tf-idf/', fields: tf_idf_api_fields }
-let graph_construction_api = { name: 'graph_construction', url: 'api/graph-construction/', fields: graph_construction_api_fields }
+let tf_idf_api = { name: 'tf_idf', targets: tf_idf_targets, url: 'api/tf-idf/', fields: tf_idf_api_fields }
+let graph_construction_api = { name: 'graph_construction', targets: graph_construction_targets, url: 'api/graph-construction/', fields: graph_construction_api_fields }
 let graph_viewer_api = { name: 'graph_viewr', url: 'api/graph-viewer/', fields: graph_construction_api_fields }
 
 // api arrays
@@ -94,6 +109,7 @@ const APIs = {
     tf_idf: tf_idf_api,
     graph_construction: graph_construction_api,
     graph_viewer: graph_viewer_api,
+    lemmatizing: lemmatizing_api
 
 }
 
@@ -175,27 +191,35 @@ function update_controll_color(control_id, color) {
 
 }
 
+
 // function that checks current connection is valid or not
 function check_connection(source_node, target_node) {
+    if (APIs[String(source_node).toLowerCase()].targets.includes(target_node)) {
+        return true;
+    } else { return false; }
 
-    if (source_node == 'Import_Collection' &&
-        (target_node == 'Tokenization')) {
-        return true;
-    } else if (source_node == 'Tokenization' && (target_node != 'Tokenization') && (target_node != 'Graph_Viewer')) {
-        return true;
-    } else if (source_node == 'Stemming' && (target_node == 'Export_File' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics')) {
-        return true;
-    } else if (source_node == 'Stopword_Removal' && (target_node == 'Stemming' || target_node == 'Export_File' || target_node == 'Doc_Statistics')) {
-        return true;
-    } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal' || source_node == 'Doc_Statistics' || source_node == 'TF_IDF')) {
-        return true;
-    } else if (target_node == 'Graph_Construction' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
-        return true;
-    } else if (source_node == 'Graph_Construction' && (target_node == 'Graph_Viewer' || target_node == 'Export_File')) {
-        return true;
-    } else if (target_node == 'TF_IDF' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
-        return true;
-    } else return false;
+
+    // if (source_node == 'Import_Collection' &&
+    //     (target_node == 'Tokenization')) {
+    //     return true;
+    // } else if (source_node == 'Tokenization' && (target_node != 'Tokenization') && (target_node != 'Graph_Viewer')) {
+    //     return true;
+    // } else if (source_node == 'Stemming' && (target_node == 'Export_File' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics')) {
+    //     return true;
+    // } else if (source_node == 'Lemmatizing' && (target_node == 'Export_File' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics' || target_node == 'Stemming')) {
+    //     return true;
+    // } else if (source_node == 'Stopword_Removal' && (target_node == 'Stemming' || target_node == 'Export_File' || target_node == 'Doc_Statistics' || target_node == 'Lemmatizing')) {
+    //     return true;
+    // } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' ||
+    //         target_node == 'Lemmatizing' || source_node == 'Stopword_Removal' || source_node == 'Doc_Statistics' || source_node == 'TF_IDF')) {
+    //     return true;
+    // } else if (target_node == 'Graph_Construction' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
+    //     return true;
+    // } else if (source_node == 'Graph_Construction' && (target_node == 'Graph_Viewer' || target_node == 'Export_File')) {
+    //     return true;
+    // } else if (target_node == 'TF_IDF' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
+    //     return true;
+    // } else return false;
 
 }
 
@@ -399,6 +423,9 @@ function send_request(formData, url, form_id, form_class) {
                 } else if (form_class == 'doc_statistics') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-2">' + value.distinct + '</td>' + '<td class="col-2">' + value.stop + '</td>' + '<td class="col-2">' + value.main + '</td>' + '</tr>');
                     // $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-6">' + value.frequent + '</td>'  + '</tr>');
+
+                } else if (form_class == 'lemmatizing') {
+                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_lemmatized + '</td>' + '<td class="col-2">' + value.lemmatized_count + '</td>' + '</tr>');
 
                 } else if (form_class == 'stemming') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
@@ -898,7 +925,7 @@ instance.bind("ready", function() {
     }
 
     function get_form_class(form_id) {
-        class_names = ['import_collection', 'tokenization', 'stopword_removal', 'stemming', 'doc_statistics', 'tf_idf', 'graph_construction', 'graph_viewer', 'export_file'];
+        class_names = ['import_collection', 'tokenization', 'stopword_removal', 'stemming', 'lemmatizing', 'doc_statistics', 'tf_idf', 'graph_construction', 'graph_viewer', 'export_file'];
         form_selector = 'form#' + form_id;
         class_name = ''
         $.each(class_names, function(index, value) {

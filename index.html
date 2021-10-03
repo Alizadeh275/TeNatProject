@@ -92,8 +92,8 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel"></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                     <div class="modal-body" id="snapshot">
                         <div id="graph-container" class="w-100 h-100 p-1 border">
@@ -142,7 +142,7 @@
             <nav class="navbar navbar-expand-lg navbar-light bg-light w-100 mb-0 py-0">
                 <a class="navbar-brand text-info" style="  font-family: 'Brush Script MT', cursive;" href="#">Teenat</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse py-0" id="navbarNav">
                     <ul class="navbar-nav">
@@ -172,9 +172,10 @@
                     <div class="p-1 w-100 text-light bg-info"> Basic Analysis</div>
                     <div id='Tokenization' class="control basic border-secondary"><i class="bi bi-funnel-fill text-secondary"></i> Tokenization</div>
                     <div id='Stopword_Removal' class="control basic border-secondary"><i class="bi bi-eraser-fill text-secondary"></i> STW Removal</div>
-                    <div id='TF_IDF' class="control basic border-secondary"><i class="bi bi-table text-secondary "></i> TF-IDF Weight</div>
                     <div id='Stemming' class="control basic border-secondary"><i class="bi bi-snow2 text-secondary font-weight-bolder pr-2"></i> Stemming</div>
+                    <div id='Lemmatizing' class="control basic border-secondary"><i class="bi bi-snow2 text-secondary font-weight-bolder pr-2"></i> Lemmatizing</div>
                     <div id='Doc_Statistics' class="control basic border-secondary"><i class="fa fa-line-chart text-secondary font-weight-bolder pr-2"></i> Doc Statistics</div>
+                    <div id='TF_IDF' class="control basic border-secondary"><i class="bi bi-table text-secondary "></i> TF-IDF Weight</div>
 
                     <div class="p-1 w-100 text-light  bg-info"> Graph Analysis</div>
                     <div id='Graph_Construction' style=" white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" class="control border-secondary"><i class="bi bi-diagram-3-fill text-secondary"></i> Graph <span style="font-size: 12px;">Construction</span></div>
@@ -334,6 +335,28 @@
                                 <td>Mark</td>
                                 <td>Otto</td>
                             </tr> -->
+                        </tbody>
+                    </table>
+
+
+
+                    <!-- lemmatizing -->
+                    <table id="Lemmatizing" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Document name</th>
+                                <th scope="col"> Lemmatized Word</th>
+                                <th scope="col"> Lemmatized Count</th>
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+        </tr> -->
                         </tbody>
                     </table>
 
@@ -855,6 +878,81 @@
                                   </label>
                                 <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
                             </div> -->
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
+
+
+
+                    <!-- Lemmatizing -->
+
+                    <form class="my-form-control d-none w-100 lemmatizing" id="Lemmatizing">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Lemmatizing</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
+                            <select id="language" class="form-control pl-0 mt-0">
+                                <option value="English" selected>English</option>
+                                <option value="Persian">Persian</option>
+                            </select>
+
+                            <!-- <div class="form-check mt-2 px-0">
+            <label class="form-check-label" for="flexCheckChecked">
+                Chekbox:
+              </label>
+            <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
+        </div> -->
 
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
