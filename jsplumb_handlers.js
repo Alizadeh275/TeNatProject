@@ -67,11 +67,12 @@ export_file_api_fields = { name: 'file_name', from: 'source_address', output_for
 tf_idf_api_fields = { name: 'file_name', from: 'source_address', method: 'algorithm' };
 graph_construction_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
 graph_viewer_api_fields = { name: 'file_name', from: 'source_address' };
+join_api_fields = { from_path1: 'from_path1', from_path2: 'from_path2', name1: 'name1', name2: 'name2' };
 
 // api targets
-let node_names = ['Import_Collection', 'Tokenization', 'Stopword_Removal', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Graph_Construction', 'Graph_viewer', 'Export_File'];
+let node_names = ['Join', 'Import_Collection', 'Tokenization', 'Stopword_Removal', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Graph_Construction', 'Graph_viewer', 'Export_File'];
 
-let import_targets = ['Tokenization'];
+let import_targets = ['Tokenization', 'Join'];
 
 let tokenization_targets = node_names.filter(x => !['Tokenization', 'Graph_Viewer'].includes(x));
 let stemming_targets = ['Stopword_Removal', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
@@ -97,8 +98,8 @@ let export_file_api = { name: 'export_file', url: 'api/export/', fields: export_
 let tf_idf_api = { name: 'tf_idf', targets: tf_idf_targets, url: 'api/tf-idf/', fields: tf_idf_api_fields }
 let graph_construction_api = { name: 'graph_construction', targets: graph_construction_targets, url: 'api/graph-construction/', fields: graph_construction_api_fields }
 let graph_viewer_api = { name: 'graph_viewr', url: 'api/graph-viewer/', fields: graph_construction_api_fields }
-
-// api arrays
+let join_api = { name: 'name', url: 'api/join/', fields: join_api_fields }
+    // api arrays
 const APIs = {
     import_collection: import_collection_api,
     tokenization: tokenization_api,
@@ -109,7 +110,8 @@ const APIs = {
     tf_idf: tf_idf_api,
     graph_construction: graph_construction_api,
     graph_viewer: graph_viewer_api,
-    lemmatizing: lemmatizing_api
+    lemmatizing: lemmatizing_api,
+    join: join_api
 
 }
 
@@ -821,6 +823,28 @@ instance.bind("ready", function() {
                     isTarget: true,
                     connectionType: "gray-connection",
                     maxConnections: 1
+                });
+            } else if (draggable_element_id.includes('Join')) {
+                instance.addEndpoint(node_id, {
+                    endpoint: "Dot",
+                    anchor: [0, 0.2, -1, 0],
+                    isTarget: true,
+                    connectionType: "gray-connection",
+                    maxConnections: 1
+                });
+                instance.addEndpoint(node_id, {
+                    endpoint: "Dot",
+                    anchor: [0, 0.8, -1, 0],
+                    isTarget: true,
+                    connectionType: "gray-connection",
+                    maxConnections: 1
+                });
+                instance.addEndpoint(node_id, {
+                    endpoint: "Dot",
+                    anchor: ["RightMiddle"],
+                    isSource: true,
+                    connectionType: "gray-connection",
+                    maxConnections: 10
                 });
             } else {
                 instance.addEndpoint(node_id, {
