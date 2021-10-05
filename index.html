@@ -177,7 +177,7 @@
                     <div id='Import_Collection' class="control import border-secondary"><i class="bi bi-file-earmark-zip-fill text-secondary"></i> Import Collection</div>
                     <!-- <div id='Import_Document' class="control import border-secondary"><i class="bi bi-file-text-fill mr-0 text-secondary"></i> Import Document</div> -->
                     <div id='Export_File' class="control export border-secondary"><i class="bi bi-file-earmark-arrow-up-fill mr-0 text-secondary"></i> Export File</div>
-                    <div id='Join' class="control export border-secondary"><i class="bi bi-file-earmark-arrow-up-fill mr-0 text-secondary"></i> Join</div>
+                    <div id='Join' class="control export border-secondary"><i id="join_icon" class="bi bi-share-fill fa-flip-horizontal mr-2 text-secondary"></i> Join</div>
 
                     <div class="p-1 w-100 text-light bg-info"> Basic Analysis</div>
                     <div id='Tokenization' class="control basic border-secondary"><i class="bi bi-funnel-fill text-secondary"></i> Tokenization</div>
@@ -1291,10 +1291,14 @@
                         <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
 
                         <div class="form-group px-1">
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input Collection 1:</label>
+                            <input class="form-control" id="name1" disabled>
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Input address 1:</label>
                             <input class="form-control" id="from_path1" disabled>
 
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input Collection 2:</label>
+                            <input class="form-control" id="name2" disabled>
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Input address 2:</label>
                             <input class="form-control" id="from_path2" disabled>

@@ -67,20 +67,19 @@ export_file_api_fields = { name: 'file_name', from: 'source_address', output_for
 tf_idf_api_fields = { name: 'file_name', from: 'source_address', method: 'algorithm' };
 graph_construction_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
 graph_viewer_api_fields = { name: 'file_name', from: 'source_address' };
-join_api_fields = { from_path1: 'from_path1', from_path2: 'from_path2', name1: 'name1', name2: 'name2' };
+join_api_fields = { from1: 'from_path1', from2: 'from_path2', name1: 'name1', name2: 'name2' };
 
 // api targets
 let node_names = ['Join', 'Import_Collection', 'Tokenization', 'Stopword_Removal', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Graph_Construction', 'Graph_viewer', 'Export_File'];
 
 let import_targets = ['Tokenization', 'Join'];
-
 let tokenization_targets = node_names.filter(x => !['Tokenization', 'Graph_Viewer'].includes(x));
-let stemming_targets = ['Stopword_Removal', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
-let lemmatizing_targets = ['Stopword_Removal', 'Stemming', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
-let stop_word_removal_targets = ['Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
-let doc_statistics_targets = ['Export_File'];
-let tf_idf_targets = ['Export_File'];
-let graph_construction_targets = ['Export_File', 'Graph_Viewer'];
+let stemming_targets = ['Join', 'Stopword_Removal', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let lemmatizing_targets = ['Join', 'Stopword_Removal', 'Stemming', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let stop_word_removal_targets = ['Join', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let doc_statistics_targets = ['Join', 'Export_File'];
+let tf_idf_targets = ['Join', 'Export_File'];
+let graph_construction_targets = ['Join', 'Export_File', 'Graph_Viewer'];
 
 // api object
 let import_collection_api = { name: 'import_collection', targets: import_targets, url: 'api/import/', fields: import_collection_api_fields }
@@ -168,6 +167,9 @@ function update_meta_data(form_selector, source_collection, source_node, source_
         $(target_state_selector).addClass(text_color);
     }
 
+
+
+
 }
 
 // function for updating color of node in workspace segment
@@ -199,30 +201,6 @@ function check_connection(source_node, target_node) {
     if (APIs[String(source_node).toLowerCase()].targets.includes(target_node)) {
         return true;
     } else { return false; }
-
-
-    // if (source_node == 'Import_Collection' &&
-    //     (target_node == 'Tokenization')) {
-    //     return true;
-    // } else if (source_node == 'Tokenization' && (target_node != 'Tokenization') && (target_node != 'Graph_Viewer')) {
-    //     return true;
-    // } else if (source_node == 'Stemming' && (target_node == 'Export_File' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics')) {
-    //     return true;
-    // } else if (source_node == 'Lemmatizing' && (target_node == 'Export_File' || target_node == 'Stopword_Removal' || target_node == 'Doc_Statistics' || target_node == 'Stemming')) {
-    //     return true;
-    // } else if (source_node == 'Stopword_Removal' && (target_node == 'Stemming' || target_node == 'Export_File' || target_node == 'Doc_Statistics' || target_node == 'Lemmatizing')) {
-    //     return true;
-    // } else if (target_node == 'Export_File' && (source_node == 'Tokenization' || source_node == 'Stemming' ||
-    //         target_node == 'Lemmatizing' || source_node == 'Stopword_Removal' || source_node == 'Doc_Statistics' || source_node == 'TF_IDF')) {
-    //     return true;
-    // } else if (target_node == 'Graph_Construction' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
-    //     return true;
-    // } else if (source_node == 'Graph_Construction' && (target_node == 'Graph_Viewer' || target_node == 'Export_File')) {
-    //     return true;
-    // } else if (target_node == 'TF_IDF' && (source_node == 'Tokenization' || source_node == 'Stemming' || source_node == 'Stopword_Removal')) {
-    //     return true;
-    // } else return false;
-
 }
 
 // function that showes  preview and node_info segment of current node while clicked in workspace
@@ -347,6 +325,26 @@ function get_node_info_field(form_id, field) {
 
     } else if (field == 'current_address') {
         p_selector = ' .meta-data p.current_address';
+    } else if (field == 'name1') {
+        p_selector = ' input#name1';
+        field_selector = form_selector + p_selector;
+        field_value = $(field_selector).val()
+        return field_value;
+    } else if (field == 'name2') {
+        p_selector = ' input#name2';
+        field_selector = form_selector + p_selector;
+        field_value = $(field_selector).val()
+        return field_value;
+    } else if (field == 'from_path1') {
+        p_selector = ' input#from_path1';
+        field_selector = form_selector + p_selector;
+        field_value = $(field_selector).val()
+        return field_value;
+    } else if (field == 'from_path2') {
+        p_selector = ' input#from_path2';
+        field_selector = form_selector + p_selector;
+        field_value = $(field_selector).val()
+        return field_value;
     } else if (field == 'state') {
         p_selector = ' .meta-data p.state';
     }
@@ -378,6 +376,43 @@ function get_target_nodes(source_node_id) {
     return target_nodes;
 }
 
+function update_join_parameters(form_id, input_params) {
+    let form_selector = 'form#' + form_id;
+    $.each(input_params, function(index, value) {
+        name_selector = form_selector + ' input#name' + String(index + 1);
+        from_path_selector = form_selector + ' input#from_path' + String(index + 1);
+
+        $(name_selector).val(value.name);
+        $(from_path_selector).val(value.from_path);
+
+    });
+    let name1 = get_node_info_field(form_id, 'name1').replace(/.zip/g, '').replace('.rar', '').replace('.7z', '');
+    let name2 = get_node_info_field(form_id, 'name2').replace('.zip', '').replace('.rar', '').replace('.7z', '');
+    let source_collection = (name1 + '_' + name2);
+    let cc_address = get_node_info_field(form_id, 'current_address');
+    let source_address = get_node_info_field(form_id, 'from_path1') + ', ' + get_node_info_field(form_id, 'from_path2');
+
+    update_meta_data(form_selector, source_collection, '', '', source_address, cc_address, 'default', '');
+
+}
+
+function get_input_params(current_node_id) {
+    let source_nodes = []
+    let input_param = [];
+    var connected = instance.getConnections();
+    $.each(connected, function(e, s) {
+        if (s.target.id == current_node_id) {
+            source_nodes.push(s.source.id);
+            let form_id = s.source.id;
+            let file_name = get_node_info_field(form_id, 'file_name');
+            let from_path = get_node_info_field(form_id, 'current_address');
+            input_param.push({ 'form_id': form_id, 'name': file_name, 'from_path': from_path });
+
+        }
+    });
+    return input_param;
+}
+
 // update all connected nodes (meta data)
 function update_connected_node(form_id) {
     target_nodes = get_target_nodes(form_id);
@@ -392,7 +427,13 @@ function update_connected_node(form_id) {
         update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, source_cc_address, 'default', StateColor.Ready, '');
         update_controll_color(value, StateColor.Ready);
 
+        if (get_form_class(value) == 'join') {
+            update_join_parameters(value, get_input_params(value));
+
+        }
+
     });
+
 }
 
 // send ajax request to api
@@ -447,9 +488,9 @@ function send_request(formData, url, form_id, form_class) {
                 if (typeof(value.output_path) != 'undefined') {
                     current_address = value.output_path;
                 }
-                if (form_class == 'import_collection') {
-                    current_address = value.file_name;
-                }
+                // if (form_class == 'import_collection') {
+                //     current_address = value.file_name;
+                // }
                 update_meta_data(form_selector, value.file_name, 'default', 'default', 'default', current_address, 'default', '');
             }
 
@@ -562,7 +603,18 @@ function basic_running(form_id, form_class) {
 
 }
 
+function get_form_class(form_id) {
+    class_names = ['join', 'import_collection', 'tokenization', 'stopword_removal', 'stemming', 'lemmatizing', 'doc_statistics', 'tf_idf', 'graph_construction', 'graph_viewer', 'export_file'];
+    form_selector = 'form#' + form_id;
+    class_name = ''
+    $.each(class_names, function(index, value) {
+        if ($(form_selector).hasClass(value)) {
+            class_name = value;
+        }
 
+    });
+    return class_name;
+}
 /*-----------------------  Actions  ------------------------- */
 
 instance.bind("connection", function(info) {
@@ -589,7 +641,12 @@ instance.bind("connection", function(info) {
     if (source_state == 'Completed') {
         update_meta_data(target_form_selector, source_collection, source_node, source_unique_id, current_address, 'default', StateColor.Ready, '');
         update_controll_color(target_id, StateColor.Ready);
+        if (get_form_class(target_id) == 'join') {
+            update_join_parameters(target_id, get_input_params(target_id));
+
+        }
     }
+
 
 
     if (!check_connection(source_node, target_node)) {
@@ -827,14 +884,14 @@ instance.bind("ready", function() {
             } else if (draggable_element_id.includes('Join')) {
                 instance.addEndpoint(node_id, {
                     endpoint: "Dot",
-                    anchor: [0, 0.2, -1, 0],
+                    anchor: [0, 0.25, -1, 0],
                     isTarget: true,
                     connectionType: "gray-connection",
                     maxConnections: 1
                 });
                 instance.addEndpoint(node_id, {
                     endpoint: "Dot",
-                    anchor: [0, 0.8, -1, 0],
+                    anchor: [0, 0.75, -1, 0],
                     isTarget: true,
                     connectionType: "gray-connection",
                     maxConnections: 1
@@ -948,18 +1005,7 @@ instance.bind("ready", function() {
         });
     }
 
-    function get_form_class(form_id) {
-        class_names = ['import_collection', 'tokenization', 'stopword_removal', 'stemming', 'lemmatizing', 'doc_statistics', 'tf_idf', 'graph_construction', 'graph_viewer', 'export_file'];
-        form_selector = 'form#' + form_id;
-        class_name = ''
-        $.each(class_names, function(index, value) {
-            if ($(form_selector).hasClass(value)) {
-                class_name = value;
-            }
 
-        });
-        return class_name;
-    }
 
 
     $('form button').click(function() {
