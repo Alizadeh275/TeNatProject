@@ -20,8 +20,18 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="workspace_page.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
-    <script src="jquery.blockUI.js">
+    <script src="jquery.blockUI.js"></script>
+
+
+    <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-graph.min.js"></script>
+
+    <!-- Include from the CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js">
     </script>
+
+
+
     <!-- Script for logging every ajax request  -->
     <script>
         $(document).ready(function() {
@@ -40,6 +50,7 @@
                         border: 0
                     }
                 });
+                console.log(' block');
             });
 
             $(document).ajaxStop(function() {
@@ -55,6 +66,8 @@
                 // debugger;
                 console.log('ajax complete.');
                 $.unblockUI();
+                console.log(' Unblock');
+
             });
             $(document).ajaxError(function(event, request, settings) {
                 // debugger;
@@ -69,25 +82,113 @@
 
     <!-- Main container including one row with three columns (nodes toolbox,(workspace, preview), info toolbox) in that -->
     <div class="container-fluid">
+
+        <!-- Large modal -->
+        <button type="button" id="modal-button" class="btn btn-primary d-none" data-toggle="modal" data-target=".bd-example-modal-lg">Large modal</button>
+
+        <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content" style="height: 600px;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="snapshot">
+                        <div id="graph-container" class="w-100 h-100 p-1 border">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="save_graph_view" onclick="takeshot()" type="button" class="btn btn-info">Save</button>
+                        <div id="output" class="d-none"></div>
+
+                        <script type="text/javascript">
+                            // Define the function 
+                            // to screenshot the div
+                            function takeshot() {
+                                let div =
+                                    document.getElementById('snapshot');
+
+                                // Use the html2canvas
+                                // function to take a screenshot
+                                // and append it
+                                // to the output div
+                                html2canvas(div).then(
+                                    function(canvas) {
+                                        document
+                                            .getElementById('output')
+                                            .appendChild(canvas);
+
+                                        var a = document.createElement('a');
+                                        // toDataURL defaults to png, so we need to request a jpeg, then convert for file download.
+                                        a.href = canvas.toDataURL("image/jpeg").replace("image/jpeg", "image/octet-stream");
+                                        a.download = 'graph.png';
+                                        a.click();
+
+                                    })
+                            }
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
         <div class="row">
+
+            <nav class="navbar navbar-expand-lg navbar-light bg-light w-100 mb-0 py-0">
+                <a class="navbar-brand text-info" style="  font-family: 'Brush Script MT', cursive;" href="#">Teenat</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse py-0" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link disabled " href="#">File <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled " href="#">Edit</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link disabled " href="#">Window</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link disabled " href="#">View</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">Help</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </nav>
+
             <!-- First Column: nodes toolbox -->
-            <div class="col-md-2 p-1">
-                <div id="toolbox" class="p-0 justify-content-center" style="overflow: scroll;">
+            <div class="col-md-2 p-1 pt-0 mt-0">
+                <div id="toolbox" class="p-0 justify-content-center mt-0" style="overflow: scroll;">
                     <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="position: sticky; top: 0; z-index: 1;font-size: 12px;">Nodes</p>
                     <div class="p-1 w-100 text-light bg-info"> Import/Export Data</div>
                     <div id='Import_Collection' class="control import border-secondary"><i class="bi bi-file-earmark-zip-fill text-secondary"></i> Import Collection</div>
-                    <div id='Import_Document' class="control import border-secondary"><i class="bi bi-file-text-fill mr-0 text-secondary"></i> Import Document</div>
-                    <div id='Export_File' class="control export border-secondary"><i class="bi bi-file-earmark-arrow-up-fill mr-0 text-secondary"></i> Export File</div>
+                    <!-- <div id='Import_Document' class="control import border-secondary"><i class="bi bi-file-text-fill mr-0 text-secondary"></i> Import Document</div> -->
+                    <div id='Export_File' class="control export border-secondary"><i class="bi bi-file-earmark-arrow-up-fill mr-1 text-secondary"></i> Export File</div>
+                    <div id='Join' class="control export border-secondary"><i id="join_icon" class="bi bi-share-fill fa-flip-horizontal mr-2 text-secondary"></i> Join</div>
 
                     <div class="p-1 w-100 text-light bg-info"> Basic Analysis</div>
                     <div id='Tokenization' class="control basic border-secondary"><i class="bi bi-funnel-fill text-secondary"></i> Tokenization</div>
                     <div id='Stopword_Removal' class="control basic border-secondary"><i class="bi bi-eraser-fill text-secondary"></i> STW Removal</div>
-                    <div id='TF-IDF_Weight' class="control basic border-secondary"><i class="bi bi-table text-secondary "></i> TF-IDF Weight</div>
-                    <div id='Stemming' class="control basic border-secondary"><i class="bi bi-snow2 text-secondary font-weight-bolder pr-2"></i> Stemming</div>
+                    <div id='Stemming' class="control basic border-secondary"><i class="bi bi-scissors text-secondary font-weight-bolder pr-2"></i> Stemming</div>
+                    <div id='Lemmatizing' class="control basic border-secondary"><i class="bi bi-snow2 text-secondary font-weight-bolder pr-2"></i> Lemmatizing</div>
                     <div id='Doc_Statistics' class="control basic border-secondary"><i class="fa fa-line-chart text-secondary font-weight-bolder pr-2"></i> Doc Statistics</div>
+                    <div id='TF_IDF' class="control basic border-secondary"><i class="bi bi-table text-secondary "></i> TF-IDF Weight</div>
 
                     <div class="p-1 w-100 text-light  bg-info"> Graph Analysis</div>
-                    <div id='Graph_Creation' class="control border-secondary"><i class="bi bi-diagram-3-fill text-secondary"></i> Graph Creation</div>
+                    <div id='Graph_Construction' style=" white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" class="control border-secondary"><i class="bi bi-diagram-3-fill text-secondary"></i> Graph <span style="font-size: 12px;">Construction</span></div>
                     <div id='Graph_Viewer' class="control border-secondary"><i class="bi bi-easel-fill text-secondary"></i> Graph Viewer</div>
 
 
@@ -95,42 +196,45 @@
             </div>
 
             <!-- Second Columns: workspace & preview -->
-            <div class="col-md-8  p-1">
+            <div class="col-md-8  p-1 mt-0">
                 <!-- Zoom in/out  buttons -->
-                <div class="text-info  m-0 p-0" style="  position: absolute;top: 16px;left: 10px;z-index: 50;">
+                <div class="text-info  m-0 p-0" style="  position: absolute;top: 5px;left: 10px;z-index: 50;">
                     <a class="zoom d-block"><i class="fas fa-search-plus"></i></a>
                     <a class="zoom-out d-block"><i class="fas fa-search-minus"></i></a>
                     <a class="zoom-init d-block"><i class="fas fa-recycle"></i></a>
                 </div>
                 <!-- Script for zooming actions -->
                 <script>
-                    // var zoom = 1;
+                    var zoom = 1;
 
-                    // $('.zoom').on('click', function() {
-                    //     if (zoom <= 1.5) {
-                    //         zoom += 0.1;
-                    //         $('.target').css('zoom', zoom);
-                    //     }
+                    $('.zoom').on('click', function() {
+                        if (zoom <= 1.3) {
+                            zoom += 0.1;
+                            $('.target').css('zoom', zoom);
+                        }
 
-                    // });
-                    // $('.zoom-init').on('click', function() {
-                    //     zoom = 1;
-                    //     $('.target').css('zoom', zoom);
-                    // });
-                    // $('.zoom-out').on('click', function() {
-                    //     if (zoom >= 0.5) {
-                    //         zoom -= 0.1;
-                    //         $('.target').css('zoom', zoom);
-                    //     }
+                    });
+                    $('.zoom-init').on('click', function() {
+                        zoom = 1;
+                        $('.target').css('zoom', zoom);
+                    });
+                    $('.zoom-out').on('click', function() {
+                        if (zoom >= 0.5) {
+                            zoom -= 0.1;
+                            $('.target').css('zoom', zoom);
+                        }
 
-                    // });
+                    });
                 </script>
 
                 <!-- workspace -->
-                <div id="workspace" class="zoom box target">
-                    <!-- <div id="control1" class="control" style="left: 50px; top: 50px"><i class="bi bi-file-earmark-arrow-down-fill mr-1 text-success"></i> Import Data</div>
-                        <div id="control2" class="control" style="left: 300px; top: 200px"> <i class="bi bi-file-earmark-arrow-up-fill mr-1 text-success"></i>Export Data</div> -->
+                <div class="workspace_container">
+                    <div id="workspace" class="zoom box target mt-0">
+                        <!-- <div id="control1" class="control" style="left: 50px; top: 50px"><i class="bi bi-file-earmark-arrow-down-fill mr-1 text-success"></i> Import Data</div>
+                            <div id="control2" class="control" style="left: 300px; top: 200px"> <i class="bi bi-file-earmark-arrow-up-fill mr-1 text-success"></i>Export Data</div> -->
+                    </div>
                 </div>
+
 
 
                 <!-- preview -->
@@ -142,8 +246,8 @@
 
 
 
-                    <!-- table -->
-                    <table id="Import_Collection" class="table table-bordered d-none table-hover">
+                    <!-- Join -->
+                    <table id="Join" class="table table-bordered d-none table-hover">
                         <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
                             <tr class="text-light">
                                 <th scope="col">#</th>
@@ -163,6 +267,31 @@
                             </tr> -->
                         </tbody>
                     </table>
+
+
+
+                    <!-- table -->
+                    <table id="Import_Collection" class="table table-bordered d-none table-hover">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col">Document Name</th>
+                                <th scope="col">Document Text (1th line)</th>
+                                <th scope="col">Document Size (KB)</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+            <th class="col-1" scope="row">1</th>
+            <td class="col-4">Mark</td>
+            <td class="col-5">Otto</td>
+            <td class="col-2">Otto</td>
+
+        </tr> -->
+                        </tbody>
+                    </table>
+
 
                     <table id="Tokenization" class="table table-bordered table-hover d-none">
                         <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
@@ -248,6 +377,69 @@
                     </table>
 
 
+
+                    <!-- lemmatizing -->
+                    <table id="Lemmatizing" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Document name</th>
+                                <th scope="col"> Lemmatized Word</th>
+                                <th scope="col"> Lemmatized Count</th>
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+        </tr> -->
+                        </tbody>
+                    </table>
+
+                    <!--  -->
+                    <!-- TF_IDF -->
+                    <table id="TF_IDF" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Term</th>
+                                <th scope="col"> Document</th>
+                                <th scope="col"> Weight</th>
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+
+                    <!-- Graph_Construction -->
+                    <table id="Graph_Construction" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Source</th>
+                                <th scope="col"> Target</th>
+                                <th scope="col"> Similarity</th>
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+        </tr> -->
+                        </tbody>
+                    </table>
+
+
                     <!-- export file -->
 
                     <!-- ####################################### -->
@@ -277,15 +469,17 @@
 
             <!-- third column: node info toolbox -->
             <div class="col-md-2  p-1">
-                <div class="right_toolbox p-0 justify-content-center" id="toolbox" style="overflow: scroll;">
+                <div class="right_toolbox p-0 justify-content-center mt-0" id="toolbox" style="overflow: scroll;">
 
                     <!-- Import Collection -->
-                    <form class="my-form-control d-none import_collection" id="Import_Collection">
+                    <form class="my-form-control w-100 d-none import_collection" id="Import_Collection">
                         <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
                             <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
                             <h3 class="bg-light w-100 m-0 p-2">Import Collection</h3>
-                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
-                             <p class="d-inline" style="font-size: 22px;;">Run</p></button>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
                         </div>
 
                         <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
@@ -297,7 +491,9 @@
                                 <label class="input-group-btn">
                                     <span id="file-btn" class="btn btn-outline-info rounded-0">
                                         <!-- &hellip; -->
-                                        <i class="bi bi-folder-fill" style="font-size: 15px;"></i> <input id="FilUploader" class="FilUploader" type="file"  style="display: none;" accept=".zip">
+                                        <i class="bi bi-folder-fill" style="font-size: 15px;"></i> <input
+                                            id="FilUploader" class="FilUploader" type="file" style="display: none;"
+                                            accept=".rar .zip .7z">
                                     </span>
                                 </label>
                                 <input id="text-input" type="text" class="form-control border-left-0 border-info" readonly>
@@ -346,7 +542,7 @@
                                         state_selector = '#' + form_id.concat(' .state');
                                         tip_selector = '#' + form_id.concat(' .tip');
 
-                                        var fileExtension = ['zip'];
+                                        var fileExtension = ['zip', 'rar', '7z'];
                                         if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
                                             alert("Only formats are allowed : " + fileExtension.join(', '));
                                             $(this).val(null);
@@ -470,7 +666,6 @@
                         </div>
                     </form>
 
-                    <!-- Import Document Form -->
 
                     <!-- Tokenization Form -->
 
@@ -478,8 +673,10 @@
                         <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
                             <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
                             <h3 class="bg-light w-100 m-0 p-2">Tokenization</h3>
-                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
-                             <p class="d-inline" style="font-size: 22px;;">Run</p></button>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
 
@@ -487,11 +684,11 @@
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Seperator:</label>
                             <select id="seperator" class="form-control pl-0 mt-0">
-                                  <option value=" "  selected>space</option>
-                                  <!-- <option>comma</option>
+                                <option value=" " selected>space</option>
+                                <!-- <option>comma</option>
                                   <option>tab</option>
                                   <option disabled>special character</option> -->
-                                </select>
+                            </select>
                             <!-- <div class="form-check mt-2 px-0">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     Chekbox:
@@ -551,8 +748,10 @@
                         <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
                             <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
                             <h3 class="bg-light w-100 m-0 p-2">STW Removal</h3>
-                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
-                             <p class="d-inline" style="font-size: 22px;;">Run</p></button>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
 
@@ -560,9 +759,9 @@
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
                             <select id="language" class="form-control pl-0 mt-0">
-                                  <option value="English" selected>English</option>
-                                  <option value="Persian" >Persian</option>
-                                </select>
+                                <option value="English" selected>English</option>
+                                <option value="Persian">Persian</option>
+                            </select>
                             <!-- <div class="form-check mt-2 px-0">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     Chekbox:
@@ -621,8 +820,10 @@
                         <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
                             <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
                             <h3 class="bg-light w-100 m-0 p-2">Doc Statistics</h3>
-                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
-                             <p class="d-inline" style="font-size: 22px;;">Run</p></button>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
 
@@ -631,14 +832,8 @@
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
                             <select id="language" class="form-control pl-0 mt-0">
                                 <option value="English" selected>English</option>
-                                <option value="Persian" >Persian</option>
-                                </select>
-                            <!-- <div class="form-check mt-2 px-0">
-                                <label class="form-check-label" for="flexCheckChecked">
-                                    Chekbox:
-                                  </label>
-                                <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
-                            </div> -->
+                                <option value="Persian">Persian</option>
+                            </select>
 
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
@@ -692,8 +887,10 @@
                         <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
                             <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
                             <h3 class="bg-light w-100 m-0 p-2">Stemming</h3>
-                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
-                             <p class="d-inline" style="font-size: 22px;;">Run</p></button>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
 
@@ -701,17 +898,17 @@
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
                             <select id="language" class="form-control pl-0 mt-0">
-                                  <option value="English" selected>English</option>
-                                  <option value="Persian">Persian</option>
-                                </select>
+                                <option value="English" selected>English</option>
+                                <option value="Persian">Persian</option>
+                            </select>
 
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Algorithm:</label>
                             <select id="algorithm" class="form-control pl-0 mt-0">
-                                      <option value="Porter" selected>Porter</option>
-                                      <option value="Snowball">Snowball</option>
-                                      <option value="Lancaster">Lancaster</option>
-                                    </select>
+                                <option value="Porter" selected>Porter</option>
+                                <option value="Snowball">Snowball</option>
+                                <option value="Lancaster">Lancaster</option>
+                            </select>
 
                             <!-- <div class="form-check mt-2 px-0">
                                 <label class="form-check-label" for="flexCheckChecked">
@@ -764,15 +961,415 @@
                         </div>
                     </form>
 
+
+
+
+                    <!-- Lemmatizing -->
+
+                    <form class="my-form-control d-none w-100 lemmatizing" id="Lemmatizing">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Lemmatizing</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
+                            <select id="language" class="form-control pl-0 mt-0">
+                                <option value="English" selected>English</option>
+                                <option value="Persian">Persian</option>
+                            </select>
+
+                            <!-- <div class="form-check mt-2 px-0">
+            <label class="form-check-label" for="flexCheckChecked">
+                Chekbox:
+              </label>
+            <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
+        </div> -->
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
+
+
+                    <!-- TF-IDF -->
+
+                    <form class="my-form-control d-none w-100 tf_idf" id="TF_IDF">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">TF-IDF</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Algorithm:</label>
+                            <select id="algorithm" class="form-control pl-0 mt-0">
+                                <option value="basic" selected>basic</option>
+                                <option value="gensim">gensim</option>
+                                <option value="sklearn">sklearn</option>
+                            </select>
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
+
+                    <!-- Graph_Construction -->
+
+                    <form class="my-form-control d-none w-100 graph_construction" id="Graph_Construction">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Graph Construction</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Similarity Measure:</label>
+                            <select id="graph_type" class="form-control pl-0 mt-0">
+                                <option value="Jaccard" selected>Jaccard</option>
+                                <option value="LSI">LSI</option>
+                            </select>
+
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Minimum Similarity:</label>
+                            <select id="min_sim" class="form-control pl-0 mt-0">
+                                <option value="0.0" selected>0.0</option>
+                                <option value="0.1">0.1</option>
+                                <option value="0.2">0.2</option>
+                                <option value="0.3">0.3</option>
+                                <option value="0.4">0.4</option>
+                                <option value="0.5">0.5</option>
+                                <option value="0.6">0.6</option>
+                                <option value="0.7">0.7</option>
+                                <option value="0.8">0.8</option>
+                                <option value="0.9">0.9</option>
+                                <option value="1.0">1.0</option>
+                            </select>
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
+
+
+
+
+
+                    <!-- ====================================================== -->
+                    <!-- Graph_Viewer -->
+
+                    <form class="my-form-control d-none w-100 graph_viewer" id="Graph_Viewer">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Graph Viewer</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Data:</label>
+                            <select id="graph_type" class="form-control pl-0 mt-0" disabled>
+                                <option value="Red" selected>__data__</option>
+                            </select>
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Node Shape:</label>
+                            <select id="node_shape" class="form-control pl-0 mt-0">
+                                <option value="circle" selected>circle</option>
+                                <option value="diamond">diamond</option>
+                                <option value="square">square</option>
+                                <option value="star5">star5</option>
+                            </select>
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Node Size:</label>
+                            <select id="node_size" class="form-control pl-0 mt-0">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                                <option value="50">50</option>
+                            </select>
+
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+                            <div class="row mt-1 border-bottom px-1 d-none">
+                                <label class="text-secondary w-100">data:</label>
+                                <p id="graph_data" class=" mb-1 graph_data"></p>
+                            </div>
+
+
+                        </div>
+                    </form>
+
+
+
+                    <!-- Join  Form -->
+
+                    <form class="my-form-control d-none w-100 join" id="Join">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Join</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">
+                                    <a>Run</a>
+                                </p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input Collection 1:</label>
+                            <input class="form-control" id="name1" disabled>
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input address 1:</label>
+                            <input class="form-control" id="from_path1" disabled>
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input Collection 2:</label>
+                            <input class="form-control" id="name2" disabled>
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input address 2:</label>
+                            <input class="form-control" id="from_path2" disabled>
+
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+                        </div>
+                    </form>
+
+
+
+
+
+
                     <!-- Export Data Form -->
 
                     <form class="my-form-control d-none w-100 export_file" id="Export_File">
                         <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
                             <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
                             <h3 class="bg-light w-100 m-0 p-2">Export File</h3>
-                            <button type="button" class="btn btn-success my-2  w-100"><i class="bi bi-play-circle-fill"></i>
-                             <p class="d-inline" style="font-size: 22px;;">
-                                    <a>Run</a></p></button>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">
+                                    <a>Run</a>
+                                </p>
+                            </button>
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
 
@@ -783,7 +1380,7 @@
                                 <option value=".zip" selected>.zip</option>
                                 <option value=".rar">.rar</option>
                                 <option value=".7z">.7z</option>
-                              </select>
+                            </select>
 
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
