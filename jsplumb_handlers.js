@@ -454,7 +454,7 @@ function send_request(formData, url, form_id, form_class) {
         $(table_selector).children().remove();
         $.each(res, function(index, value) {
             if (index > 0) {
-                if (form_class == 'import_collection') {
+                if (form_class == 'import_collection' || form_class == 'join') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.name + '</td>' + '<td class="col-4">' + value.text + '</td>' + '<td class="col-3">' + String(Math.round(Number(value.size) / 1000)) + '</td>' + '</tr>');
 
                 } else if (form_class == 'tokenization') {

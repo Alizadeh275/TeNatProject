@@ -24,15 +24,25 @@
     text-align: center;
 }
 
+.workspace_container {
+    height: 60vh;
+    overflow: scroll;
+    border-width: 2px;
+    border-style: solid;
+    border-color: lightgrey;
+}
+
 #workspace {
     background-size: 100%;
-    height: 60vh;
+    height: 150vh;
     position: relative;
     overflow: scroll;
     background: url(grid-png-43558.png);
     object-fit: fill;
     background-repeat: repeat;
     margin-bottom: 0;
+    border: none;
+    overflow: hidden;
     /* margin-bottom: 0; */
 }
 
