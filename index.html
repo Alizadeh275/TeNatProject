@@ -29,6 +29,9 @@
     <!-- Include from the CDN -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js">
     </script>
+
+
+
     <!-- Script for logging every ajax request  -->
     <script>
         $(document).ready(function() {
@@ -47,6 +50,7 @@
                         border: 0
                     }
                 });
+                console.log(' block');
             });
 
             $(document).ajaxStop(function() {
@@ -62,6 +66,8 @@
                 // debugger;
                 console.log('ajax complete.');
                 $.unblockUI();
+                console.log(' Unblock');
+
             });
             $(document).ajaxError(function(event, request, settings) {
                 // debugger;
@@ -86,8 +92,8 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel"></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                     <div class="modal-body" id="snapshot">
                         <div id="graph-container" class="w-100 h-100 p-1 border">
@@ -136,16 +142,25 @@
             <nav class="navbar navbar-expand-lg navbar-light bg-light w-100 mb-0 py-0">
                 <a class="navbar-brand text-info" style="  font-family: 'Brush Script MT', cursive;" href="#">Teenat</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse py-0" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link disabled " href="#">Home <span class="sr-only">(current)</span></a>
+                            <a class="nav-link disabled " href="#">File <span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled " href="#">File</a>
+                            <a class="nav-link disabled " href="#">Edit</a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link disabled " href="#">Window</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link disabled " href="#">View</a>
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link disabled" href="#">Help</a>
                         </li>
@@ -161,14 +176,16 @@
                     <div class="p-1 w-100 text-light bg-info"> Import/Export Data</div>
                     <div id='Import_Collection' class="control import border-secondary"><i class="bi bi-file-earmark-zip-fill text-secondary"></i> Import Collection</div>
                     <!-- <div id='Import_Document' class="control import border-secondary"><i class="bi bi-file-text-fill mr-0 text-secondary"></i> Import Document</div> -->
-                    <div id='Export_File' class="control export border-secondary"><i class="bi bi-file-earmark-arrow-up-fill mr-0 text-secondary"></i> Export File</div>
+                    <div id='Export_File' class="control export border-secondary"><i class="bi bi-file-earmark-arrow-up-fill mr-1 text-secondary"></i> Export File</div>
+                    <div id='Join' class="control export border-secondary"><i id="join_icon" class="bi bi-share-fill fa-flip-horizontal mr-2 text-secondary"></i> Join</div>
 
                     <div class="p-1 w-100 text-light bg-info"> Basic Analysis</div>
                     <div id='Tokenization' class="control basic border-secondary"><i class="bi bi-funnel-fill text-secondary"></i> Tokenization</div>
                     <div id='Stopword_Removal' class="control basic border-secondary"><i class="bi bi-eraser-fill text-secondary"></i> STW Removal</div>
-                    <div id='TF_IDF' class="control basic border-secondary"><i class="bi bi-table text-secondary "></i> TF-IDF Weight</div>
-                    <div id='Stemming' class="control basic border-secondary"><i class="bi bi-snow2 text-secondary font-weight-bolder pr-2"></i> Stemming</div>
+                    <div id='Stemming' class="control basic border-secondary"><i class="bi bi-scissors text-secondary font-weight-bolder pr-2"></i> Stemming</div>
+                    <div id='Lemmatizing' class="control basic border-secondary"><i class="bi bi-snow2 text-secondary font-weight-bolder pr-2"></i> Lemmatizing</div>
                     <div id='Doc_Statistics' class="control basic border-secondary"><i class="fa fa-line-chart text-secondary font-weight-bolder pr-2"></i> Doc Statistics</div>
+                    <div id='TF_IDF' class="control basic border-secondary"><i class="bi bi-table text-secondary "></i> TF-IDF Weight</div>
 
                     <div class="p-1 w-100 text-light  bg-info"> Graph Analysis</div>
                     <div id='Graph_Construction' style=" white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" class="control border-secondary"><i class="bi bi-diagram-3-fill text-secondary"></i> Graph <span style="font-size: 12px;">Construction</span></div>
@@ -188,33 +205,36 @@
                 </div>
                 <!-- Script for zooming actions -->
                 <script>
-                    // var zoom = 1;
+                    var zoom = 1;
 
-                    // $('.zoom').on('click', function() {
-                    //     if (zoom <= 1.5) {
-                    //         zoom += 0.1;
-                    //         $('.target').css('zoom', zoom);
-                    //     }
+                    $('.zoom').on('click', function() {
+                        if (zoom <= 1.3) {
+                            zoom += 0.1;
+                            $('.target').css('zoom', zoom);
+                        }
 
-                    // });
-                    // $('.zoom-init').on('click', function() {
-                    //     zoom = 1;
-                    //     $('.target').css('zoom', zoom);
-                    // });
-                    // $('.zoom-out').on('click', function() {
-                    //     if (zoom >= 0.5) {
-                    //         zoom -= 0.1;
-                    //         $('.target').css('zoom', zoom);
-                    //     }
+                    });
+                    $('.zoom-init').on('click', function() {
+                        zoom = 1;
+                        $('.target').css('zoom', zoom);
+                    });
+                    $('.zoom-out').on('click', function() {
+                        if (zoom >= 0.5) {
+                            zoom -= 0.1;
+                            $('.target').css('zoom', zoom);
+                        }
 
-                    // });
+                    });
                 </script>
 
                 <!-- workspace -->
-                <div id="workspace" class="zoom box target mt-0">
-                    <!-- <div id="control1" class="control" style="left: 50px; top: 50px"><i class="bi bi-file-earmark-arrow-down-fill mr-1 text-success"></i> Import Data</div>
-                        <div id="control2" class="control" style="left: 300px; top: 200px"> <i class="bi bi-file-earmark-arrow-up-fill mr-1 text-success"></i>Export Data</div> -->
+                <div class="workspace_container">
+                    <div id="workspace" class="zoom box target mt-0">
+                        <!-- <div id="control1" class="control" style="left: 50px; top: 50px"><i class="bi bi-file-earmark-arrow-down-fill mr-1 text-success"></i> Import Data</div>
+                            <div id="control2" class="control" style="left: 300px; top: 200px"> <i class="bi bi-file-earmark-arrow-up-fill mr-1 text-success"></i>Export Data</div> -->
+                    </div>
                 </div>
+
 
 
                 <!-- preview -->
@@ -226,8 +246,8 @@
 
 
 
-                    <!-- table -->
-                    <table id="Import_Collection" class="table table-bordered d-none table-hover">
+                    <!-- Join -->
+                    <table id="Join" class="table table-bordered d-none table-hover">
                         <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
                             <tr class="text-light">
                                 <th scope="col">#</th>
@@ -247,6 +267,31 @@
                             </tr> -->
                         </tbody>
                     </table>
+
+
+
+                    <!-- table -->
+                    <table id="Import_Collection" class="table table-bordered d-none table-hover">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col">Document Name</th>
+                                <th scope="col">Document Text (1th line)</th>
+                                <th scope="col">Document Size (KB)</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+            <th class="col-1" scope="row">1</th>
+            <td class="col-4">Mark</td>
+            <td class="col-5">Otto</td>
+            <td class="col-2">Otto</td>
+
+        </tr> -->
+                        </tbody>
+                    </table>
+
 
                     <table id="Tokenization" class="table table-bordered table-hover d-none">
                         <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
@@ -331,6 +376,28 @@
                         </tbody>
                     </table>
 
+
+
+                    <!-- lemmatizing -->
+                    <table id="Lemmatizing" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Document name</th>
+                                <th scope="col"> Lemmatized Word</th>
+                                <th scope="col"> Lemmatized Count</th>
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+        </tr> -->
+                        </tbody>
+                    </table>
+
                     <!--  -->
                     <!-- TF_IDF -->
                     <table id="TF_IDF" class="table table-bordered table-hover d-none">
@@ -405,7 +472,7 @@
                 <div class="right_toolbox p-0 justify-content-center mt-0" id="toolbox" style="overflow: scroll;">
 
                     <!-- Import Collection -->
-                    <form class="my-form-control d-none import_collection" id="Import_Collection">
+                    <form class="my-form-control w-100 d-none import_collection" id="Import_Collection">
                         <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
                             <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
                             <h3 class="bg-light w-100 m-0 p-2">Import Collection</h3>
@@ -896,6 +963,81 @@
 
 
 
+
+                    <!-- Lemmatizing -->
+
+                    <form class="my-form-control d-none w-100 lemmatizing" id="Lemmatizing">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Lemmatizing</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Language:</label>
+                            <select id="language" class="form-control pl-0 mt-0">
+                                <option value="English" selected>English</option>
+                                <option value="Persian">Persian</option>
+                            </select>
+
+                            <!-- <div class="form-check mt-2 px-0">
+            <label class="form-check-label" for="flexCheckChecked">
+                Chekbox:
+              </label>
+            <input class="form-check-input float-right ml-2" style="width: 18px; height: 18px;" type="checkbox" value="" id="flexCheckChecked">
+        </div> -->
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
+
+
                     <!-- TF-IDF -->
 
                     <form class="my-form-control d-none w-100 tf_idf" id="TF_IDF">
@@ -1068,10 +1210,24 @@
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Data:</label>
                             <select id="graph_type" class="form-control pl-0 mt-0" disabled>
                                 <option value="Red" selected>__data__</option>
-                                <option value="Blue">Blue</option>
                             </select>
 
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Node Shape:</label>
+                            <select id="node_shape" class="form-control pl-0 mt-0">
+                                <option value="circle" selected>circle</option>
+                                <option value="diamond">diamond</option>
+                                <option value="square">square</option>
+                                <option value="star5">star5</option>
+                            </select>
 
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Node Size:</label>
+                            <select id="node_size" class="form-control pl-0 mt-0">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                                <option value="50">50</option>
+                            </select>
 
 
                         </div>
@@ -1123,6 +1279,79 @@
 
 
 
+                    <!-- Join  Form -->
+
+                    <form class="my-form-control d-none w-100 join" id="Join">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Join</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">
+                                    <a>Run</a>
+                                </p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input Collection 1:</label>
+                            <input class="form-control" id="name1" disabled>
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input address 1:</label>
+                            <input class="form-control" id="from_path1" disabled>
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input Collection 2:</label>
+                            <input class="form-control" id="name2" disabled>
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Input address 2:</label>
+                            <input class="form-control" id="from_path2" disabled>
+
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+                        </div>
+                    </form>
 
 
 
