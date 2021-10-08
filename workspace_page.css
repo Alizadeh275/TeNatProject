@@ -35,6 +35,7 @@
 #workspace {
     background-size: 100%;
     height: 150vh;
+    width: 180vw;
     position: relative;
     overflow: scroll;
     background: url(grid-png-43558.png);

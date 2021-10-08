@@ -596,8 +596,13 @@ function basic_running(form_id, form_class) {
         button_selector = 'form#' + source_id + ' button';
         $(button_selector).click();
 
-        let form_selector = 'form#' + fid + ' button';
-        $(form_selector).click();
+        if (get_node_info_field(source_id, 'state') == 'Complete') {
+            let form_selector = 'form#' + fid + ' button';
+            $(form_selector).click();
+        }
+
+
+
 
     }
 
