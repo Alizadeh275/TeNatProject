@@ -24,8 +24,8 @@ The actions divide into two category:
 
 /*----------------------  Variables  ------------------------- */
 
-// var host = 'http://localhost:8000/';
-var host = 'https://tenat.pythonanywhere.com/';
+var host = 'http://localhost:8000/';
+// var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
 let grapn_viewer_data = {}
 instance.setContainer("workspace");
@@ -596,7 +596,7 @@ function basic_running(form_id, form_class) {
         button_selector = 'form#' + source_id + ' button';
         $(button_selector).click();
 
-        if (get_node_info_field(source_id, 'state') == 'Complete') {
+        if (get_node_info_field(source_id, 'state') == 'Completed') {
             let form_selector = 'form#' + fid + ' button';
             $(form_selector).click();
         }
