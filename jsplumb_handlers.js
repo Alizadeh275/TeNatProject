@@ -906,7 +906,7 @@ instance.bind("ready", function() {
                     anchor: ["RightMiddle"],
                     isSource: true,
                     connectionType: "gray-connection",
-                    maxConnections: 10
+                    maxConnections: 10,
                 });
             } else {
                 instance.addEndpoint(node_id, {
@@ -1187,9 +1187,12 @@ instance.bind("ready", function() {
                 source_id = get_source_node(form_id);
                 button_selector = 'form#' + source_id + ' button';
                 $(button_selector).click();
+                if (get_node_info_field(source_id, 'state') == 'Completed') {
 
-                let form_selector = 'form#' + form_id + ' button';
-                $(form_selector).click();
+                    let form_selector = 'form#' + form_id + ' button';
+                    $(form_selector).click();
+                }
+
             } //else
 
         }
