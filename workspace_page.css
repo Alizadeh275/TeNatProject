@@ -82,6 +82,7 @@
 
 #workspace .control {
     position: absolute;
+    z-index: 8;
 }
 
 .window {
