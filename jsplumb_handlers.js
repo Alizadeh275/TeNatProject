@@ -24,8 +24,8 @@ The actions divide into two category:
 
 /*----------------------  Variables  ------------------------- */
 
-// var host = 'http://localhost:8000/';
-var host = 'https://tenat.pythonanywhere.com/';
+var host = 'http://localhost:8000/';
+// var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
 let grapn_viewer_data = {}
 instance.setContainer("workspace");
