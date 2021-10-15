@@ -120,7 +120,6 @@
     margin: 10px 5px;
     box-shadow: '';
     border-color: '';
-    color: #17a2b8;
     overflow: hidden;
 }
 
@@ -129,10 +128,9 @@
     transition-duration: 0.2;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     border-color: #17a2b8 !important;
-    color: white !important;
-    background-color: #17a2b8;
-    font-size: 17px;
-    transition: 0.3s;
+    color: #17a2b8 !important;
+    transform: scale(1.02);
+    transition: 0.1s;
     ;
 }
 
@@ -144,8 +142,8 @@ i#join_icon {
 
 #toolbox div.control:hover i {
     /* border-width: 4px; */
-    color: white !important;
-    transition: 0.3s;
+    color: #17a2b8 !important;
+    transition: 0.1s;
     ;
 }
 
