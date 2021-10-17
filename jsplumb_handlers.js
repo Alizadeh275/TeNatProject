@@ -55,6 +55,7 @@ const StateColor = {
 
 //  api fields
 import_collection_api_fields = { name: 'file_name', file: 'file' };
+sample_data_api_fields = { name: 'input_collection' };
 
 // tokenization is always after import..so from = source_node
 tokenization_api_fields = { name: 'file_name', from: 'source_node', seperator: 'seperator' };
@@ -70,9 +71,10 @@ graph_viewer_api_fields = { name: 'file_name', from: 'source_address' };
 join_api_fields = { from1: 'from_path1', from2: 'from_path2', name1: 'name1', name2: 'name2' };
 
 // api targets
-let node_names = ['Join', 'Import_Collection', 'Tokenization', 'Stopword_Removal', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Graph_Construction', 'Graph_viewer', 'Export_File'];
+let node_names = ['Sample_Data', 'Join', 'Import_Collection', 'Tokenization', 'Stopword_Removal', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Graph_Construction', 'Graph_viewer', 'Export_File'];
 
 let import_targets = ['Tokenization', 'Join'];
+let sample_data_targets = ['Tokenization', 'Join'];
 let tokenization_targets = node_names.filter(x => !['Tokenization', 'Graph_Viewer'].includes(x));
 let stemming_targets = ['Join', 'Stopword_Removal', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
 let lemmatizing_targets = ['Join', 'Stopword_Removal', 'Stemming', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
@@ -83,6 +85,7 @@ let graph_construction_targets = ['Join', 'Export_File', 'Graph_Viewer'];
 
 // api object
 let import_collection_api = { name: 'import_collection', targets: import_targets, url: 'api/import/', fields: import_collection_api_fields }
+let sample_data_api = { name: 'sample_data', targets: sample_data_targets, url: 'api/sample-data/', fields: sample_data_api_fields }
 let tokenization_api = { name: 'tokenization', targets: tokenization_targets, url: 'api/tokenize/', fields: tokenization_api_fields }
 let stopword_removal_api = {
     name: 'stopword_removal',
@@ -110,7 +113,8 @@ const APIs = {
     graph_construction: graph_construction_api,
     graph_viewer: graph_viewer_api,
     lemmatizing: lemmatizing_api,
-    join: join_api
+    join: join_api,
+    sample_data: sample_data_api
 
 }
 
@@ -177,6 +181,7 @@ function update_controll_color(control_id, color) {
 
     text_color = 'text-'.concat(color);
     border_color = 'border-'.concat(color);
+    // bg_color = 'bg-'.concat(color);
 
     controll_selector = 'div.control#'.concat(control_id);
     icon_selector = controll_selector.concat(' i');
@@ -192,6 +197,10 @@ function update_controll_color(control_id, color) {
     // update node border color
     $(controll_selector).removeClass("border-success border-info border-warning border-danger border-secondary");
     $(controll_selector).addClass(border_color);
+
+    // // update node bg color
+    // $(controll_selector).removeClass("bg-success bg-info bg-warning bg-danger bg-secondary");
+    // $(controll_selector).addClass(bg_color);
 
 }
 
@@ -265,6 +274,12 @@ function get_node_info_field(form_id, field) {
     if (field == 'file_name') {
 
         p_selector = ' .meta-data p.source_collection';
+
+    } else if (field == 'input_collection') {
+
+        field_selector = form_selector + ' select#input_collection';
+        field_value = $(field_selector).find(":selected").val();
+        return field_value;
 
     } else if (field == 'language') {
 
@@ -454,7 +469,7 @@ function send_request(formData, url, form_id, form_class) {
         $(table_selector).children().remove();
         $.each(res, function(index, value) {
             if (index > 0) {
-                if (form_class == 'import_collection' || form_class == 'join') {
+                if (form_class == 'import_collection' || form_class == 'join' || form_class == 'sample_data') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.name + '</td>' + '<td class="col-4">' + value.text + '</td>' + '<td class="col-3">' + String(Math.round(Number(value.size) / 1000)) + '</td>' + '</tr>');
 
                 } else if (form_class == 'tokenization') {
@@ -549,34 +564,7 @@ function get_all_previous_nodes(current_node_id) {
 
 }
 
-function main_run(form_id, form_class) {
 
-
-    let fid = form_id;
-    current_state = get_node_info_field(fid, 'state');
-
-    if (current_state != 'Completed') {
-
-        pn = get_all_previous_nodes(form_id);
-        $.each(pn, function(index, value) {
-            let form_selector = 'form#' + pn;
-            button_selector = form_selector + ' button';
-            if (get_node_info_field(pn, 'state') != 'Completed') {
-                $(button_selector).click();
-            }
-            while (get_node_info_field(pn, 'state') != 'Completed') {};
-
-        });
-        let fid = form_id;
-        current_state = get_node_info_field(fid, 'state');
-
-        fields = APIs[form_class].fields;
-        url = host + APIs[form_class].url;
-        formData = make_formData(fid, fields);
-        send_request(formData, url, fid, form_class);
-    }
-
-}
 
 // function that runs when click on node run button (expect of import and export)
 function basic_running(form_id, form_class) {
@@ -609,7 +597,7 @@ function basic_running(form_id, form_class) {
 }
 
 function get_form_class(form_id) {
-    class_names = ['join', 'import_collection', 'tokenization', 'stopword_removal', 'stemming', 'lemmatizing', 'doc_statistics', 'tf_idf', 'graph_construction', 'graph_viewer', 'export_file'];
+    class_names = ['sample_data', 'join', 'import_collection', 'tokenization', 'stopword_removal', 'stemming', 'lemmatizing', 'doc_statistics', 'tf_idf', 'graph_construction', 'graph_viewer', 'export_file'];
     form_selector = 'form#' + form_id;
     class_name = ''
     $.each(class_names, function(index, value) {
@@ -870,7 +858,7 @@ instance.bind("ready", function() {
             // alert(s);
 
             /*------ setting endpoint of each dropped node -----------*/
-            if (draggable_element_id.includes('Import')) {
+            if (draggable_element_id.includes('Import') || draggable_element_id.includes('Sample_Data')) {
                 instance.addEndpoint(node_id, {
                     endpoint: "Dot",
                     anchor: ["RightMiddle"],
@@ -878,6 +866,7 @@ instance.bind("ready", function() {
                     connectionType: "gray-connection",
                     maxConnections: 10
                 });
+
             } else if (draggable_element_id.includes('Export') || draggable_element_id.includes('Graph_Viewer')) {
                 instance.addEndpoint(node_id, {
                     endpoint: "Dot",
@@ -927,6 +916,12 @@ instance.bind("ready", function() {
             }
 
             /* --------#########################--------- */
+            if (draggable_element_id.includes('Sample_Data')) {
+                update_controll_color(node_id, StateColor.Ready);
+            } else {
+                update_controll_color(node_id, StateColor.Created);
+
+            }
 
             // Create Info Segment
             create_node_info_segment(node_id, draggable_element_id);
