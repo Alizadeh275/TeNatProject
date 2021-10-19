@@ -145,6 +145,12 @@ i#join_icon {
     ;
 }
 
+.badge {
+    position: relative;
+    z-index: 50;
+    top: -10px;
+}
+
 
 /* width */
 
