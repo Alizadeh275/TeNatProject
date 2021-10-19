@@ -71,21 +71,24 @@ graph_viewer_api_fields = { name: 'file_name', from: 'source_address' };
 join_api_fields = { from1: 'from_path1', from2: 'from_path2', name1: 'name1', name2: 'name2' };
 
 topic_modeling_api_fields = { name: 'file_name', from: 'source_address', method: 'method', limit: 'limit' };
+topic_viewer_api_fields = { name: 'file_name', from: 'source_address', output: 'output' };
+entity_recognition_api_fields = { name: 'file_name', from: 'source_address', style: 'style' };
 
 
 // api targets
-let node_names = ['Topic_Modeling', 'Sample_Data', 'Join', 'Import_Collection', 'Tokenization', 'Stopword_Removal', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Graph_Construction', 'Graph_viewer', 'Export_File'];
+let node_names = ['Entity_Recognition', 'Topic_Viewer', 'Topic_Modeling', 'Sample_Data', 'Join', 'Import_Collection', 'Tokenization', 'Stopword_Removal', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Graph_Construction', 'Graph_viewer', 'Export_File'];
 
 let import_targets = ['Tokenization', 'Join'];
 let sample_data_targets = ['Tokenization', 'Join'];
 let tokenization_targets = node_names.filter(x => !['Tokenization', 'Graph_Viewer'].includes(x));
-let stemming_targets = ['Topic_Modeling', 'Join', 'Stopword_Removal', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
-let lemmatizing_targets = ['Topic_Modeling', 'Join', 'Stopword_Removal', 'Stemming', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
-let stop_word_removal_targets = ['Topic_Modeling', 'Join', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let stemming_targets = ['Entity_Recognition', 'Topic_Modeling', 'Join', 'Stopword_Removal', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let lemmatizing_targets = ['Entity_Recognition', 'Topic_Modeling', 'Join', 'Stopword_Removal', 'Stemming', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let stop_word_removal_targets = ['Entity_Recognition', 'Topic_Modeling', 'Join', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
 let doc_statistics_targets = ['Join', 'Export_File'];
 let tf_idf_targets = ['Join', 'Export_File'];
 let graph_construction_targets = ['Join', 'Export_File', 'Graph_Viewer'];
 let topic_modeling_targets = ['Join', 'Export_File', 'Topic_Viewer'];
+let entity_recognition_targets = ['Join', 'Export_File'];
 
 // api object
 let import_collection_api = { name: 'import_collection', targets: import_targets, url: 'api/import/', fields: import_collection_api_fields }
@@ -106,6 +109,8 @@ let graph_construction_api = { name: 'graph_construction', targets: graph_constr
 let graph_viewer_api = { name: 'graph_viewr', url: 'api/graph-viewer/', fields: graph_construction_api_fields }
 let join_api = { name: 'name', url: 'api/join/', fields: join_api_fields }
 let topic_modeling_api = { name: 'name', url: 'api/topic-modeling/', fields: topic_modeling_api_fields }
+let topic_viewer_api = { name: 'name', url: 'api/topic-viewer/', fields: topic_viewer_api_fields }
+let entity_recognition_api = { name: 'name', url: 'api/entity-recognition/', fields: entity_recognition_api_fields }
     // api arrays
 const APIs = {
     import_collection: import_collection_api,
@@ -120,7 +125,9 @@ const APIs = {
     lemmatizing: lemmatizing_api,
     join: join_api,
     sample_data: sample_data_api,
-    topic_modeling: topic_modeling_api
+    topic_modeling: topic_modeling_api,
+    topic_viewer: topic_viewer_api,
+    entity_recognition: entity_recognition_api
 
 }
 
@@ -347,6 +354,18 @@ function get_node_info_field(form_id, field) {
         field_value = $(field_selector).find(":selected").val();
         return field_value;
 
+    } else if (field == 'output') {
+
+        field_selector = form_selector + ' select#output';
+        field_value = $(field_selector).find(":selected").val();
+        return field_value;
+
+    } else if (field == 'style') {
+
+        field_selector = form_selector + ' select#style';
+        field_value = $(field_selector).find(":selected").val();
+        return field_value;
+
     } else if (field == 'source_node') {
         p_selector = ' .meta-data p.source_node';
 
@@ -518,6 +537,12 @@ function send_request(formData, url, form_id, form_class) {
                 } else if (form_class == 'topic_modeling') {
                     $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-11">' + value.topic + '</td>' + '</tr>');
 
+                } else if (form_class == 'topic_viewer') {
+                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-11">' + value.topic + '</td>' + '</tr>');
+
+                } else if (form_class == 'entity_recognition') {
+                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.entites + '</td>' + '<td class="col-4">' + value.link + '</td>' + '</tr>');
+
                 }
             } else {
                 current_address = value.file_name;
@@ -618,7 +643,7 @@ function basic_running(form_id, form_class) {
 }
 
 function get_form_class(form_id) {
-    class_names = ['topic_modeling', 'sample_data', 'join', 'import_collection', 'tokenization', 'stopword_removal', 'stemming', 'lemmatizing', 'doc_statistics', 'tf_idf', 'graph_construction', 'graph_viewer', 'export_file'];
+    class_names = ['entity_recognition', 'topic_viewer', 'topic_modeling', 'sample_data', 'join', 'import_collection', 'tokenization', 'stopword_removal', 'stemming', 'lemmatizing', 'doc_statistics', 'tf_idf', 'graph_construction', 'graph_viewer', 'export_file'];
     form_selector = 'form#' + form_id;
     class_name = ''
     $.each(class_names, function(index, value) {
@@ -648,7 +673,6 @@ instance.bind("connection", function(info) {
     target_id = info.target.id;
     target_node = target_id.split('-')[0];
     target_form_selector = 'form#'.concat(target_id);
-
 
 
 

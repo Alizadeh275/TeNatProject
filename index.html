@@ -1321,7 +1321,7 @@
 
                     <!-- Entity_Recognition -->
 
-                    <form class="my-form-control d-none w-100 topic_modeling" id="Entity_Recognition">
+                    <form class="my-form-control d-none w-100 entity_recognition" id="Entity_Recognition">
                         <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
                             <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
                             <h3 class="bg-light w-100 m-0 p-2">Entity Recognition</h3>
@@ -1335,7 +1335,7 @@
                         <div class="form-group px-1">
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Style:</label>
-                            <select id="method" class="form-control pl-0 mt-0">
+                            <select id="style" class="form-control pl-0 mt-0">
                                 <option value="Jaccard" selected>ent</option>
 
                             </select>
@@ -1573,16 +1573,16 @@
                         <div class="form-group px-1">
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Data:</label>
-                            <select id="graph_type" class="form-control pl-0 mt-0" disabled>
+                            <select id="data" class="form-control pl-0 mt-0" disabled>
                                 <option value="Red" selected>__data__</option>
                             </select>
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Output:</label>
-                            <select id="graph_type" class="form-control pl-0 mt-0">
-                                <option value="dominant" selected>Topic-Keyword</option>
+                            <select id="output" class="form-control pl-0 mt-0">
+                                <option value="topic_keyword" selected>Topic-Keyword</option>
                                 <option value="dominant" >Dominant Topic</option>
                                 <option value="representive" >Most Representive Topic</option>
-                                <option value="volume_dist" >Topic Volume Distribution</option>
+                                <option value="volume_disttibution" >Topic Volume Distribution</option>
                             </select>
 
                         </div>
