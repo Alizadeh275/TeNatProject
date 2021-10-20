@@ -281,7 +281,7 @@ drop_down_fields = ['language', 'algorithm', 'seperator', 'output_format', 'grap
     'input_collection'
 ]
 meta_data_fields = ['source_collection', 'source_node', 'source_id', 'source_address', 'current_address', 'state', ]
-join_fields = ['name1', 'name2', 'from_path1', 'from_path2']
+join_fields = ['name1', 'name2', 'from_path1', 'from_path2', 'node_color']
 
 // functio for getting specific data form node parameters or node meta data
 function get_node_info_field(form_id, field) {
@@ -1113,6 +1113,7 @@ instance.bind("ready", function() {
                         min_sim = get_node_info_field(source_form_id, 'min_sim')
                         shape = get_node_info_field(form_id, 'node_shape');
                         size = parseInt(get_node_info_field(form_id, 'node_size'));
+                        node_color = get_node_info_field(form_id, 'node_color');
                         // set the chart title
                         chart.title("Minimum Similarity: " + min_sim);
 
@@ -1125,6 +1126,20 @@ instance.bind("ready", function() {
                         nodes.normal().height(size);
                         nodes.hovered().height(size + 10);
                         nodes.selected().height(size + 10);
+
+
+
+
+                        // set the fill of nodes
+                        nodes.normal().fill(node_color);
+                        nodes.hovered().fill(node_color);
+                        nodes.selected().fill('white');
+
+                        // set the stroke of nodes
+                        nodes.normal().stroke(null);
+                        nodes.hovered().stroke(node_color, 3);
+                        nodes.selected().stroke(node_color, 3);
+
                         // initiate drawing the chart
                         chart.draw();
                     });
