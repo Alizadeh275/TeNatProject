@@ -155,7 +155,6 @@ function update_meta_data(form_selector, source_collection, source_node, source_
 
     if (source_collection != 'default') {
         $(target_collection_selector).text(source_collection);
-        $(target_collection_selector).text(source_collection);
 
     }
     if (source_node != 'default') {
@@ -391,6 +390,64 @@ function update_connected_node(form_id) {
 
 }
 
+
+function update_table_data(res, form_class, form_id) {
+    table_selector = 'table#'.concat(form_id) + ' tbody';
+    $(table_selector).children().remove();
+    $.each(res, function(index, value) {
+        if (index > 0) {
+            if (form_class == 'import_collection' || form_class == 'join' || form_class == 'sample_data') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.name + '</td>' + '<td class="col-4">' + value.text + '</td>' + '<td class="col-3">' + String(Math.round(Number(value.size) / 1000)) + '</td>' + '</tr>');
+
+            } else if (form_class == 'tokenization') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.tokens + '</td>' + '<td class="col-2">' + value.tokens_count + '</td>' + '</tr>');
+
+            } else if (form_class == 'stopword_removal') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_10_removed_words + '</td>' + '<td class="col-2">' + value.removed_count + '</td>' + '</tr>');
+
+            } else if (form_class == 'doc_statistics') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-2">' + value.distinct + '</td>' + '<td class="col-2">' + value.stop + '</td>' + '<td class="col-2">' + value.main + '</td>' + '</tr>');
+                // $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-6">' + value.frequent + '</td>'  + '</tr>');
+
+            } else if (form_class == 'lemmatizing') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_lemmatized + '</td>' + '<td class="col-2">' + value.lemmatized_count + '</td>' + '</tr>');
+
+            } else if (form_class == 'stemming') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
+
+            } else if (form_class == 'graph_construction') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.source + '</td>' + '<td class="col-6">' + value.target + '</td>' + '<td class="col-2">' + value.sim + '</td>' + '</tr>');
+
+            } else if (form_class == 'tf_idf') {
+
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.term + '</td>' + '<td class="col-4">' + value.doc + '</td>' + '<td class="col-2">' + value.weight + '</td>' + '</tr>');
+
+            } else if (form_class == 'graph_viewer') {
+
+            } else if (form_class == 'topic_modeling') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-11">' + value.topic + '</td>' + '</tr>');
+
+            } else if (form_class == 'topic_viewer') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-11">' + value.topic + '</td>' + '</tr>');
+
+            } else if (form_class == 'entity_recognition') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.entites + '</td>' + '<td class="col-4">' + value.link + '</td>' + '</tr>');
+
+            }
+        } else {
+            current_address = value.file_name;
+            if (typeof(value.output_path) != 'undefined') {
+                current_address = value.output_path;
+            }
+            // if (form_class == 'import_collection') {
+            //     current_address = value.file_name;
+            // }
+            update_meta_data(form_selector, value.file_name, 'default', 'default', 'default', current_address, 'default', '');
+        }
+
+    });
+}
+
 // send ajax request to api
 function send_request(formData, url, form_id, form_class) {
     form_selector = 'form#'.concat(form_id);
@@ -405,68 +462,19 @@ function send_request(formData, url, form_id, form_class) {
 
 
     }).done(function(res) {
-        table_selector = 'table#'.concat(form_id) + ' tbody';
-        $(table_selector).children().remove();
-        $.each(res, function(index, value) {
-            if (index > 0) {
-                if (form_class == 'import_collection' || form_class == 'join' || form_class == 'sample_data') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.name + '</td>' + '<td class="col-4">' + value.text + '</td>' + '<td class="col-3">' + String(Math.round(Number(value.size) / 1000)) + '</td>' + '</tr>');
 
-                } else if (form_class == 'tokenization') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.tokens + '</td>' + '<td class="col-2">' + value.tokens_count + '</td>' + '</tr>');
-
-                } else if (form_class == 'stopword_removal') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_10_removed_words + '</td>' + '<td class="col-2">' + value.removed_count + '</td>' + '</tr>');
-
-                } else if (form_class == 'doc_statistics') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-2">' + value.distinct + '</td>' + '<td class="col-2">' + value.stop + '</td>' + '<td class="col-2">' + value.main + '</td>' + '</tr>');
-                    // $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-6">' + value.frequent + '</td>'  + '</tr>');
-
-                } else if (form_class == 'lemmatizing') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_lemmatized + '</td>' + '<td class="col-2">' + value.lemmatized_count + '</td>' + '</tr>');
-
-                } else if (form_class == 'stemming') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
-
-                } else if (form_class == 'graph_construction') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.source + '</td>' + '<td class="col-6">' + value.target + '</td>' + '<td class="col-2">' + value.sim + '</td>' + '</tr>');
-
-                } else if (form_class == 'tf_idf') {
-
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.term + '</td>' + '<td class="col-4">' + value.doc + '</td>' + '<td class="col-2">' + value.weight + '</td>' + '</tr>');
-
-                } else if (form_class == 'graph_viewer') {
-
-                } else if (form_class == 'topic_modeling') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-11">' + value.topic + '</td>' + '</tr>');
-
-                } else if (form_class == 'topic_viewer') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-11">' + value.topic + '</td>' + '</tr>');
-
-                } else if (form_class == 'entity_recognition') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.entites + '</td>' + '<td class="col-4">' + value.link + '</td>' + '</tr>');
-
-                }
-            } else {
-                current_address = value.file_name;
-                if (typeof(value.output_path) != 'undefined') {
-                    current_address = value.output_path;
-                }
-                // if (form_class == 'import_collection') {
-                //     current_address = value.file_name;
-                // }
-                update_meta_data(form_selector, value.file_name, 'default', 'default', 'default', current_address, 'default', '');
-            }
-
-        });
-
-        update_controll_color(form_id, StateColor.Completed);
+        update_table_data(res, form_class, form_id)
         update_meta_data(form_selector, 'default', 'default', 'default', 'default', current_address, StateColor.Completed, '');
         update_connected_node(form_id);
+        setTimeout(function() {
+            update_controll_color(form_id, StateColor.Completed);
+        }, 500);
 
 
     }).fail(function(res) {
-        update_controll_color(form_id, StateColor.Failed);
+        setTimeout(function() {
+            update_controll_color(form_id, StateColor.Failed);
+        }, 500);
         update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
 
     });
@@ -962,6 +970,10 @@ instance.bind("ready", function() {
         form_class = get_form_class(form_id);
         // alert(form_class);
         temp = ['export_file', 'import_collection', 'graph_viewer'];
+
+
+        update_controll_color(form_id, StateColor.Running);
+
 
         if (!temp.includes(form_class)) {
 
