@@ -147,8 +147,12 @@ i#join_icon {
 
 .badge {
     position: relative;
-    z-index: 50;
-    top: -10px;
+    z-index: 550;
+    top: -13px;
+    left: -20px;
+    transform: rotate(-45deg);
+    font-size: 10px;
+    margin-right: 0;
 }
 
 
