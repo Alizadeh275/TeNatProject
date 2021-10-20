@@ -54,25 +54,25 @@ const StateColor = {
 }
 
 //  api fields
-import_collection_api_fields = { name: 'file_name', file: 'file' };
+import_collection_api_fields = { name: 'source_collection', file: 'file' };
 sample_data_api_fields = { name: 'input_collection' };
 
 // tokenization is always after import..so from = source_node
-tokenization_api_fields = { name: 'file_name', from: 'source_node', seperator: 'seperator' };
+tokenization_api_fields = { name: 'source_collection', from: 'source_node', seperator: 'seperator' };
 
-stopword_removal_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
-doc_statistics_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
-stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
-lemmatizing_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
-export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
-tf_idf_api_fields = { name: 'file_name', from: 'source_address', method: 'algorithm' };
-graph_construction_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
-graph_viewer_api_fields = { name: 'file_name', from: 'source_address' };
+stopword_removal_api_fields = { name: 'source_collection', from: 'source_address', language: 'language' };
+doc_statistics_api_fields = { name: 'source_collection', from: 'source_address', language: 'language' };
+stemming_api_fields = { name: 'source_collection', from: 'source_address', language: 'language', algorithm: 'algorithm' };
+lemmatizing_api_fields = { name: 'source_collection', from: 'source_address', language: 'language' };
+export_file_api_fields = { name: 'source_collection', from: 'source_address', output_format: 'output_format' };
+tf_idf_api_fields = { name: 'source_collection', from: 'source_address', method: 'algorithm' };
+graph_construction_api_fields = { name: 'source_collection', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
+graph_viewer_api_fields = { name: 'source_collection', from: 'source_address' };
 join_api_fields = { from1: 'from_path1', from2: 'from_path2', name1: 'name1', name2: 'name2' };
 
-topic_modeling_api_fields = { name: 'file_name', from: 'source_address', method: 'method', limit: 'limit' };
-topic_viewer_api_fields = { name: 'file_name', from: 'source_address', output: 'output' };
-entity_recognition_api_fields = { name: 'file_name', from: 'source_address', style: 'style' };
+topic_modeling_api_fields = { name: 'source_collection', from: 'source_address', method: 'method', limit: 'limit' };
+topic_viewer_api_fields = { name: 'source_collection', from: 'source_address', output: 'output' };
+entity_recognition_api_fields = { name: 'source_collection', from: 'source_address', style: 'style' };
 
 
 // api targets
@@ -154,6 +154,7 @@ function update_meta_data(form_selector, source_collection, source_node, source_
     target_state_selector = form_selector.concat(' .meta-data p.state');
 
     if (source_collection != 'default') {
+        $(target_collection_selector).text(source_collection);
         $(target_collection_selector).text(source_collection);
 
     }
@@ -276,6 +277,12 @@ function make_formData(form_id, fields) {
 
 /* ----------------------- */
 
+drop_down_fields = ['language', 'algorithm', 'seperator', 'output_format', 'graph_type',
+    'min_sim', 'node_shape', 'node_size', 'method', 'limit', 'output', 'style',
+    'input_collection'
+]
+meta_data_fields = ['source_collection', 'source_node', 'source_id', 'source_address', 'current_address', 'state', ]
+join_fields = ['name1', 'name2', 'from_path1', 'from_path2']
 
 // functio for getting specific data form node parameters or node meta data
 function get_node_info_field(form_id, field) {
@@ -284,126 +291,22 @@ function get_node_info_field(form_id, field) {
     let form_selector = 'form#'.concat(form_id);
     let p_selector = '';
 
-    if (field == 'file_name') {
+    if (meta_data_fields.includes(field)) {
+        p_selector = ' .meta-data p.' + field;
+        field_selector = form_selector + p_selector;
+        field_value = $(field_selector).text()
 
-        p_selector = ' .meta-data p.source_collection';
-
-    } else if (field == 'input_collection') {
-
-        field_selector = form_selector + ' select#input_collection';
+    } else if (drop_down_fields.includes(field)) {
+        field_selector = form_selector + ' select#' + field;
         field_value = $(field_selector).find(":selected").val();
-        return field_value;
 
-    } else if (field == 'language') {
-
-        field_selector = form_selector + ' select#language';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'algorithm') {
-
-        field_selector = form_selector + ' select#algorithm';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'seperator') {
-
-        field_selector = form_selector + ' select#seperator';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'output_format') {
-
-        field_selector = form_selector + ' select#output_format';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'graph_type') {
-
-        field_selector = form_selector + ' select#graph_type';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'min_sim') {
-
-        field_selector = form_selector + ' select#min_sim';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'node_shape') {
-
-        field_selector = form_selector + ' select#node_shape';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'node_size') {
-
-        field_selector = form_selector + ' select#node_size';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'method') {
-
-        field_selector = form_selector + ' select#method';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'limit') {
-
-        field_selector = form_selector + ' select#limit';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'output') {
-
-        field_selector = form_selector + ' select#output';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'style') {
-
-        field_selector = form_selector + ' select#style';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'source_node') {
-        p_selector = ' .meta-data p.source_node';
-
-    } else if (field == 'source_id') {
-        p_selector = ' .meta-data p.source_id';
-
-    } else if (field == 'source_address') {
-        p_selector = ' .meta-data p.source_address';
-
-    } else if (field == 'current_address') {
-        p_selector = ' .meta-data p.current_address';
-    } else if (field == 'name1') {
-        p_selector = ' input#name1';
+    } else if (join_fields.includes(field)) {
+        p_selector = ' input#' + field;
         field_selector = form_selector + p_selector;
         field_value = $(field_selector).val()
-        return field_value;
-    } else if (field == 'name2') {
-        p_selector = ' input#name2';
-        field_selector = form_selector + p_selector;
-        field_value = $(field_selector).val()
-        return field_value;
-    } else if (field == 'from_path1') {
-        p_selector = ' input#from_path1';
-        field_selector = form_selector + p_selector;
-        field_value = $(field_selector).val()
-        return field_value;
-    } else if (field == 'from_path2') {
-        p_selector = ' input#from_path2';
-        field_selector = form_selector + p_selector;
-        field_value = $(field_selector).val()
-        return field_value;
-    } else if (field == 'state') {
-        p_selector = ' .meta-data p.state';
     }
-
-    field_selector = form_selector + p_selector;
-    field_value = $(field_selector).text()
     return field_value;
+
 }
 
 
@@ -456,9 +359,9 @@ function get_input_params(current_node_id) {
         if (s.target.id == current_node_id) {
             source_nodes.push(s.source.id);
             let form_id = s.source.id;
-            let file_name = get_node_info_field(form_id, 'file_name');
+            let source_collection = get_node_info_field(form_id, 'source_collection');
             let from_path = get_node_info_field(form_id, 'current_address');
-            input_param.push({ 'form_id': form_id, 'name': file_name, 'from_path': from_path });
+            input_param.push({ 'form_id': form_id, 'name': source_collection, 'from_path': from_path });
 
         }
     });
@@ -471,7 +374,7 @@ function update_connected_node(form_id) {
     source_id = form_id;
     source_node = source_id.split('-')[0];
     source_unique_id = source_id.replace(source_node + '-', '');
-    source_collection = get_node_info_field(form_id, 'file_name');
+    source_collection = get_node_info_field(form_id, 'source_collection');
     source_cc_address = get_node_info_field(form_id, 'current_address');
 
     $.each(target_nodes, function(index, value) {
@@ -664,7 +567,7 @@ instance.bind("connection", function(info) {
     source_unique_id = source_id.replace(source_node + '-', '');
     source_form_selector = 'form#'.concat(source_id);;
 
-    source_collection = get_node_info_field(source_id, 'file_name');
+    source_collection = get_node_info_field(source_id, 'source_collection');
 
     source_state = get_node_info_field(source_id, 'state');
     current_address = get_node_info_field(source_id, 'current_address');
@@ -1012,7 +915,7 @@ instance.bind("ready", function() {
     }
 
     function download_file(url, form_id, sequence_address) {
-        file_name = get_node_info_field(form_id, 'file_name');
+        file_name = get_node_info_field(form_id, 'source_collection');
         source_node = get_node_info_field(form_id, 'source_node');
         form_selector = 'form#'.concat(form_id);
         file_name_wo_extention = file_name.split('.').slice(0, -1).join('.')
@@ -1165,7 +1068,7 @@ instance.bind("ready", function() {
                 form_class = 'graph_viewer';
                 form_selector = 'form#'.concat(form_id);
                 source_address = get_node_info_field(form_id, 'source_address');
-                source_collection = get_node_info_field(form_id, 'file_name');
+                source_collection = get_node_info_field(form_id, 'source_collection');
 
 
                 fields = APIs[form_class].fields;
