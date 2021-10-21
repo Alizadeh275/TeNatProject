@@ -70,7 +70,7 @@ graph_construction_api_fields = { name: 'source_collection', from: 'source_addre
 graph_viewer_api_fields = { name: 'source_collection', from: 'source_address' };
 join_api_fields = { from1: 'from_path1', from2: 'from_path2', name1: 'name1', name2: 'name2' };
 
-topic_modeling_api_fields = { name: 'source_collection', from: 'source_address', method: 'method', limit: 'limit' };
+topic_modeling_api_fields = { name: 'source_collection', from: 'source_address', method: 'method', num_topics: 'num_topics' };
 topic_viewer_api_fields = { name: 'source_collection', from: 'source_address', output: 'output' };
 entity_recognition_api_fields = { name: 'source_collection', from: 'source_address', style: 'style' };
 
@@ -277,11 +277,11 @@ function make_formData(form_id, fields) {
 /* ----------------------- */
 
 drop_down_fields = ['language', 'algorithm', 'seperator', 'output_format', 'graph_type',
-    'min_sim', 'node_shape', 'node_size', 'method', 'limit', 'output', 'style',
+    'min_sim', 'node_shape', 'node_size', 'method', 'output', 'style',
     'input_collection'
 ]
 meta_data_fields = ['source_collection', 'source_node', 'source_id', 'source_address', 'current_address', 'state', ]
-join_fields = ['name1', 'name2', 'from_path1', 'from_path2', 'node_color']
+join_fields = ['name1', 'name2', 'from_path1', 'from_path2', 'node_color', 'num_topics']
 
 // functio for getting specific data form node parameters or node meta data
 function get_node_info_field(form_id, field) {
@@ -1140,10 +1140,13 @@ instance.bind("ready", function() {
                         nodes.hovered().stroke(node_color, 3);
                         nodes.selected().stroke(node_color, 3);
 
+                        chart.id('graph_chart');
+
                         // initiate drawing the chart
                         chart.draw();
                     });
                     $('#modal-button').click();
+                    document.addEventListener('contextmenu', event => event.preventDefault());
 
                     update_controll_color(form_id, StateColor.Completed);
                     update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Completed, '');

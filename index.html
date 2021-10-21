@@ -29,7 +29,10 @@
     <!-- Include from the CDN -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js">
     </script>
-
+    <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-exports.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.anychart.com/releases/8.10.0/css/anychart-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.anychart.com/releases/8.10.0/fonts/css/anychart-font.min.css" />
 
 
     <!-- Script for logging every ajax request  -->
@@ -107,6 +110,14 @@
                         <script type="text/javascript">
                             // Define the function 
                             // to screenshot the div
+                            function jpeg() {
+                                anychart.onDocumentReady(function() {
+                                    var chart = anychart.getChartById('graph_chart');
+                                    chart.saveAsPdf();
+
+                                });
+                            }
+
                             function takeshot() {
                                 let div =
                                     document.getElementById('snapshot');
@@ -129,6 +140,8 @@
 
                                     })
                             }
+                        </script>
+                        <script>
                         </script>
                     </div>
                 </div>
@@ -1396,24 +1409,29 @@
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Method:</label>
                             <select id="method" class="form-control pl-0 mt-0">
-                                <option value="Jaccard" selected>LDA</option>
+                                <option value="LDA" selected>LDA</option>
                                 <option value="LSI">LSI</option>
                                 <option value="LSI">HDP</option>
                                 <option value="LSI">Rp</option>
                             </select>
 
+                            <label for="num_topics" class="mb-1 mt-2">Num_Topics:</label>
+                            <input class="form-control" type="number" value="5" id="num_topics" min="1" max="999" keyboard="false">
 
-                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Limit <span
-                                    style="font-size: 15px;">(Max number of topics)</span>:</label>
-                            <select id="limit" class="form-control pl-0 mt-0">
-                                <option value="optimal" selected>optimal</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                                <option value="150">150</option>
-                                <option value="200">200</option>
+                            <!-- <label for="formGroupExampleInput2" class="mb-1 mt-2">Alpha:</label>
+                            <select id="method" class="form-control pl-0 mt-0">
+                                <option value="Jaccard" selected>symmetric</option>
+                                <option value="LSI">asymmetric</option>
+                                <option value="LSI">auto</option>
+                            </select> -->
+                            <!-- 
 
 
-                            </select>
+                            <label for="chunk_size" class="mb-1 mt-2">Chunk_Size:</label>
+                            <input class="form-control" type="number" value="2000" id="chunk_size" min="1" max="9999" keyboard="false"> -->
+                            <!-- 
+                            <label for="passes" class="mb-1 mt-2">Passes:</label>
+                            <input class="form-control" type="number" value="1" id="passes" min="1" max="20" keyboard="false"> -->
 
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
@@ -1498,7 +1516,7 @@
                                 <option value="50">50</option>
                             </select>
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Node Color:</label>
-                            <input id="node_color" class=" m-1 mt-2" type="color" id="favcolor" name="favcolor" value="#1976D2">
+                            <input id="node_color" style="width:30px;" class="border-0 m-1 mt-2" type="color" id="favcolor" name="favcolor" value="#1976D2">
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
                         <div class="container-fluid meta-data">
