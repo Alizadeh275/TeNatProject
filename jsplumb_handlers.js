@@ -58,7 +58,7 @@ import_collection_api_fields = { name: 'source_collection', file: 'file' };
 sample_data_api_fields = { name: 'input_collection' };
 
 // tokenization is always after import..so from = source_node
-tokenization_api_fields = { name: 'source_collection', from: 'source_node', seperator: 'seperator' };
+tokenization_api_fields = { name: 'source_collection', from: 'source_address', seperator: 'seperator' };
 
 stopword_removal_api_fields = { name: 'source_collection', from: 'source_address', language: 'language' };
 doc_statistics_api_fields = { name: 'source_collection', from: 'source_address', language: 'language' };
@@ -70,7 +70,7 @@ graph_construction_api_fields = { name: 'source_collection', from: 'source_addre
 graph_viewer_api_fields = { name: 'source_collection', from: 'source_address' };
 join_api_fields = { from1: 'from_path1', from2: 'from_path2', name1: 'name1', name2: 'name2' };
 
-topic_modeling_api_fields = { name: 'source_collection', from: 'source_address', method: 'method', num_topics: 'num_topics' };
+topic_modeling_api_fields = { name: 'source_collection', from: 'source_address', method: 'method', num_topics: 'num_topics', alpha: 'alpha', chunk_size: 'chunk_size', passes: 'passes' };
 topic_viewer_api_fields = { name: 'source_collection', from: 'source_address', output: 'output' };
 entity_recognition_api_fields = { name: 'source_collection', from: 'source_address', style: 'style' };
 
@@ -278,10 +278,10 @@ function make_formData(form_id, fields) {
 
 drop_down_fields = ['language', 'algorithm', 'seperator', 'output_format', 'graph_type',
     'min_sim', 'node_shape', 'node_size', 'method', 'output', 'style',
-    'input_collection'
+    'input_collection', 'alpha', 'output'
 ]
 meta_data_fields = ['source_collection', 'source_node', 'source_id', 'source_address', 'current_address', 'state', ]
-join_fields = ['name1', 'name2', 'from_path1', 'from_path2', 'node_color', 'num_topics']
+join_fields = ['name1', 'name2', 'from_path1', 'from_path2', 'node_color', 'num_topics', 'chunk_size', 'passes']
 
 // functio for getting specific data form node parameters or node meta data
 function get_node_info_field(form_id, field) {
@@ -470,6 +470,10 @@ function send_request(formData, url, form_id, form_class) {
             update_controll_color(form_id, StateColor.Completed);
         }, 500);
 
+        if (form_class == 'topic_viewer') {
+            alert(res);
+
+        }
 
     }).fail(function(res) {
         setTimeout(function() {
@@ -919,7 +923,7 @@ instance.bind("ready", function() {
 
 
     function correct_address_node_names(address) {
-        return address.replace('media/result/', '').replace('stop_word', 'stopword_removed').replace('/', '_').concat('_output');
+        return address.replace('media/', '').replace('/raw_text', '').replace('result', '').replace('stop_word', 'stopword_removed').replace('/', '_').concat('_output');
     }
 
     function download_file(url, form_id, sequence_address) {
@@ -969,7 +973,7 @@ instance.bind("ready", function() {
         form_id = $(this).closest('form').attr('id');
         form_class = get_form_class(form_id);
         // alert(form_class);
-        temp = ['export_file', 'import_collection', 'graph_viewer'];
+        temp = ['export_file', 'import_collection', 'graph_viewer', 'topic_viewer'];
 
 
         update_controll_color(form_id, StateColor.Running);
@@ -980,6 +984,54 @@ instance.bind("ready", function() {
             basic_running(form_id, form_class);
 
             // import collection running
+
+        } else if (form_class == 'topic_viewer') {
+            file_name = get_node_info_field(form_id, 'source_collection');
+            source_node = get_node_info_field(form_id, 'source_node');
+            form_selector = 'form#'.concat(form_id);
+            source_address = get_node_info_field(form_id, 'source_address');
+            url = host + source_address + '/lda.html'
+            current_state = get_node_info_field(form_id, 'state');
+            if (current_state != 'Created') {
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    xhrFields: {
+                        responseType: 'blob',
+
+                    },
+                    success: function(data) {
+
+                        var a = document.createElement('a');
+                        // var url = window.URL.createObjectURL(data);
+                        a.href = url;
+                        a.target = 'blank';
+                        a.download = 'lda.html';
+                        document.body.append(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                        update_controll_color(form_id, StateColor.Completed);
+                        update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Completed, '');
+                    }
+
+                }).fail(function(res) {
+                    update_controll_color(form_id, StateColor.Failed);
+                    update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
+
+
+                });
+            } else {
+                source_id = get_source_node(form_id);
+                button_selector = 'form#' + source_id + ' button';
+                $(button_selector).click();
+                if (get_node_info_field(source_id, 'state') == 'Completed') {
+
+                    let form_selector = 'form#' + form_id + ' button';
+                    $(form_selector).click();
+                }
+            }
+
         } else if (form_class == 'import_collection') {
 
 
@@ -1055,6 +1107,7 @@ instance.bind("ready", function() {
                     processData: false,
                 }).done(function(res) {
                     file_src = host + res;
+                    alert('file_res=' + file_src);
                     download_file(file_src, form_id, source_address);
 
                 }).fail(function(res) {
