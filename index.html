@@ -29,7 +29,10 @@
     <!-- Include from the CDN -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js">
     </script>
-
+    <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-exports.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.anychart.com/releases/8.10.0/css/anychart-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.anychart.com/releases/8.10.0/fonts/css/anychart-font.min.css" />
 
 
     <!-- Script for logging every ajax request  -->
@@ -97,6 +100,7 @@
                     </div>
                     <div class="modal-body" id="snapshot">
                         <div id="graph-container" class="w-100 h-100 p-1 border">
+
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -107,6 +111,14 @@
                         <script type="text/javascript">
                             // Define the function 
                             // to screenshot the div
+                            function jpeg() {
+                                anychart.onDocumentReady(function() {
+                                    var chart = anychart.getChartById('graph_chart');
+                                    chart.saveAsPdf();
+
+                                });
+                            }
+
                             function takeshot() {
                                 let div =
                                     document.getElementById('snapshot');
@@ -130,6 +142,8 @@
                                     })
                             }
                         </script>
+                        <script>
+                        </script>
                     </div>
                 </div>
             </div>
@@ -146,23 +160,15 @@
                 </button>
                 <div class="collapse navbar-collapse py-0" id="navbarNav">
                     <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link disabled " href="#">File <span class="sr-only">(current)</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link disabled " href="#">Edit</a>
-                        </li>
 
                         <li class="nav-item">
-                            <a class="nav-link disabled " href="#">Window</a>
+                            <a class="nav-link disabled " href="#">view</a>
                         </li>
-
                         <li class="nav-item">
-                            <a class="nav-link disabled " href="#">View</a>
+                            <a class="nav-link disabled " href="#">login</a>
                         </li>
-
                         <li class="nav-item">
-                            <a class="nav-link disabled" href="#">Help</a>
+                            <a class="nav-link disabled" href="#">help</a>
                         </li>
 
                     </ul>
@@ -189,10 +195,17 @@
                     <div id='TF_IDF' class="control basic border-secondary"><i class="bi bi-table text-secondary pr-1"></i> TF-IDF Weight</div>
 
                     <div class="p-1 w-100 text-light  bg-info"> Graph Analysis</div>
-                    <div id='Graph_Construction' style=" white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" class="control border-secondary"><i class="bi bi-diagram-3-fill text-secondary pr-1"></i> Graph <span style="font-size: 12px;">Construction</span></div>
+                    <div id='Graph_Construction' style=" white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" class="control border-secondary"><i class="bi bi-diagram-3-fill text-secondary pr-1"></i> Graph
+                        <span style="font-size: 12px;">Construction</span>
+                    </div>
                     <div id='Graph_Viewer' class="control border-secondary"><i class="bi bi-easel-fill text-secondary pr-1"></i> Graph Viewer</div>
 
-
+                    <div class="p-1 w-100 text-light  bg-info"> Advanced Analysis</div>
+                    <div id='Topic_Modeling' style=" white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" class="control border-secondary">
+                        <i class="bi bi-chat-quote-fill text-secondary pr-2"></i>Topic Modeling
+                    </div>
+                    <div id='Topic_Viewer' class="control border-secondary"><i class="bi bi-bar-chart-steps text-secondary pr-1"></i> Topic Viewer</div>
+                    <div id='Entity_Recognition' class="control border-secondary"><i class="bi bi-ui-checks-grid text-secondary pr-1"></i> Entity <span style="font-size: 12px;">Recongition</span></div>
                 </div>
             </div>
 
@@ -449,11 +462,42 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-        </tr> -->
+
+                        </tbody>
+                    </table>
+
+
+
+                    <!-- Topic Modeling -->
+                    <table id="Topic_Modeling" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Topic</th>
+
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+
+
+                    <!-- Entity Recognition -->
+                    <table id="Entity_Recognition" class="table table-bordered table-hover d-none">
+                        <thead class="thead-info" style="background-color:#17a2b8;position: sticky; top: 0; z-index: 1;">
+                            <tr class="text-light">
+                                <th scope="col">#</th>
+                                <th scope="col"> Document</th>
+                                <th scope="col"> Entities</th>
+                                <th scope="col"> highlighted View</th>
+
+                                <!-- <th scope="col">Term Frequency</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+
                         </tbody>
                     </table>
 
@@ -1218,7 +1262,6 @@
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Similarity Measure:</label>
                             <select id="graph_type" class="form-control pl-0 mt-0">
                                 <option value="Jaccard" selected>Jaccard</option>
-                                <option value="LSI">LSI</option>
                             </select>
 
 
@@ -1282,8 +1325,158 @@
                     </form>
 
 
+                    <!-- Entity_Recognition -->
+
+                    <form class="my-form-control d-none w-100 entity_recognition" id="Entity_Recognition">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Entity Recognition</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Style:</label>
+                            <select id="style" class="form-control pl-0 mt-0">
+                                <option value="Jaccard" selected>ent</option>
+
+                            </select>
 
 
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+
+
+
+                    <!-- Topic_Modeling -->
+
+                    <form class="my-form-control d-none w-100 topic_modeling" id="Topic_Modeling">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Topic Modeling</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Method:</label>
+                            <select id="method" class="form-control pl-0 mt-0">
+                                <option value="LDA" selected>LDA</option>
+                                <!-- <option value="LSI">LSI</option>
+                                <option value="LSI">HDP</option>
+                                <option value="LSI">Rp</option> -->
+                            </select>
+
+                            <label for="num_topics" class="mb-1 mt-2">Num_Topics:</label>
+                            <input class="form-control" type="number" value="5" id="num_topics" min="1" max="999" keyboard="false">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Alpha:</label>
+                            <select id="alpha" class="form-control pl-0 mt-0">
+                                <option value="symmetric" selected>symmetric</option>
+                                <option value="asymmetric">asymmetric</option>
+                                <option value="auto">auto</option>
+                            </select>
+
+
+
+                            <label for="chunk_size" class="mb-1 mt-2">Chunk_Size:</label>
+                            <input class="form-control" type="number" value="2000" id="chunk_size" min="1" max="9999" keyboard="false">
+
+                            <label for="passes" class="mb-1 mt-2">Passes:</label>
+                            <input class="form-control" type="number" value="1" id="passes" min="1" max="20" keyboard="false">
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+
+
+
+                        </div>
+                    </form>
 
 
                     <!-- ====================================================== -->
@@ -1309,10 +1502,10 @@
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Node Shape:</label>
                             <select id="node_shape" class="form-control pl-0 mt-0">
-                                <option value="circle" selected>circle</option>
-                                <option value="diamond">diamond</option>
-                                <option value="square">square</option>
-                                <option value="star5">star5</option>
+                                <option value="circle" selected>circle<span style='font-size:24px;'> &#9679;</span></option>
+                                <option value="square">square<span style='font-size:10px;'> &#9724;</span></option>
+                                <option value="diamond">diamond<span style='font-size:10px;'>&#9670;</span> </option>
+                                <option value="star5">star5<span style="font-size: 10px;"> &#9733;</span></option>
                             </select>
 
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Node Size:</label>
@@ -1323,8 +1516,8 @@
                                 <option value="40">40</option>
                                 <option value="50">50</option>
                             </select>
-
-
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Node Color:</label>
+                            <input id="node_color" style="width:30px;" class="border-0 m-1 mt-2" type="color" id="favcolor" name="favcolor" value="#1976D2">
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
                         <div class="container-fluid meta-data">
@@ -1372,6 +1565,83 @@
                         </div>
                     </form>
 
+
+
+
+                    <!-- Topic_Viewer -->
+
+                    <form class="my-form-control d-none w-100 topic_viewer" id="Topic_Viewer">
+                        <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
+                            <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
+                            <h3 class="bg-light w-100 m-0 p-2">Topic Viewer</h3>
+                            <button type="button" class="btn btn-success my-2  w-100"><i
+                                    class="bi bi-play-circle-fill"></i>
+                                <p class="d-inline" style="font-size: 22px;;">Run</p>
+                            </button>
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Parameters</div>
+
+                        <div class="form-group px-1">
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Data:</label>
+                            <select id="data" class="form-control pl-0 mt-0" disabled>
+                                <option value="Red" selected>__data__</option>
+                            </select>
+
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Output:</label>
+                            <select id="output" class="form-control pl-0 mt-0">
+                                <option value="topic_keyword" selected>Topic-Keyword</option>
+                                <!-- <option value="dominant" >Dominant Topic</option>
+                                <option value="representive" >Most Representive Topic</option>
+                                <option value="volume_disttibution" >Topic Volume Distribution</option> -->
+                            </select>
+
+                        </div>
+                        <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
+                        <div class="container-fluid meta-data">
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Node:</label>
+                                <p class=" mb-1 source_node" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source ID:</label>
+                                <p class=" mb-1 source_id" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Collection:</label>
+                                <p class=" mb-1 source_collection" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Source Address:</label>
+                                <p class=" mb-1 source_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Current Address:</label>
+                                <p class=" mb-1 current_address" style="  white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"></p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">State:</label>
+                                <p class=" mb-1 state">Created</p>
+                            </div>
+
+                            <div class="row mt-1 border-bottom px-1">
+                                <label class="text-secondary w-100">Tip:</label>
+                                <p class=" mb-1 tip"></p>
+                            </div>
+                            <!-- <div class="row mt-1 border-bottom px-1 d-none">
+                                <label class="text-secondary w-100">data:</label>
+                                <p id="graph_data" class=" mb-1 graph_data"></p>
+                            </div> -->
+
+
+                        </div>
+                    </form>
 
 
                     <!-- Join  Form -->

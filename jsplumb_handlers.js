@@ -24,8 +24,8 @@ The actions divide into two category:
 
 /*----------------------  Variables  ------------------------- */
 
-// var host = 'http://localhost:8000/';
-var host = 'https://tenat.pythonanywhere.com/';
+var host = 'http://localhost:8000/';
+// var host = 'https://tenat.pythonanywhere.com/';
 var instance = jsPlumb.getInstance({});
 let grapn_viewer_data = {}
 instance.setContainer("workspace");
@@ -54,34 +54,41 @@ const StateColor = {
 }
 
 //  api fields
-import_collection_api_fields = { name: 'file_name', file: 'file' };
+import_collection_api_fields = { name: 'source_collection', file: 'file' };
 sample_data_api_fields = { name: 'input_collection' };
 
 // tokenization is always after import..so from = source_node
-tokenization_api_fields = { name: 'file_name', from: 'source_node', seperator: 'seperator' };
+tokenization_api_fields = { name: 'source_collection', from: 'source_address', seperator: 'seperator' };
 
-stopword_removal_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
-doc_statistics_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
-stemming_api_fields = { name: 'file_name', from: 'source_address', language: 'language', algorithm: 'algorithm' };
-lemmatizing_api_fields = { name: 'file_name', from: 'source_address', language: 'language' };
-export_file_api_fields = { name: 'file_name', from: 'source_address', output_format: 'output_format' };
-tf_idf_api_fields = { name: 'file_name', from: 'source_address', method: 'algorithm' };
-graph_construction_api_fields = { name: 'file_name', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
-graph_viewer_api_fields = { name: 'file_name', from: 'source_address' };
+stopword_removal_api_fields = { name: 'source_collection', from: 'source_address', language: 'language' };
+doc_statistics_api_fields = { name: 'source_collection', from: 'source_address', language: 'language' };
+stemming_api_fields = { name: 'source_collection', from: 'source_address', language: 'language', algorithm: 'algorithm' };
+lemmatizing_api_fields = { name: 'source_collection', from: 'source_address', language: 'language' };
+export_file_api_fields = { name: 'source_collection', from: 'source_address', output_format: 'output_format' };
+tf_idf_api_fields = { name: 'source_collection', from: 'source_address', method: 'algorithm' };
+graph_construction_api_fields = { name: 'source_collection', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
+graph_viewer_api_fields = { name: 'source_collection', from: 'source_address' };
 join_api_fields = { from1: 'from_path1', from2: 'from_path2', name1: 'name1', name2: 'name2' };
 
+topic_modeling_api_fields = { name: 'source_collection', from: 'source_address', method: 'method', num_topics: 'num_topics', alpha: 'alpha', chunk_size: 'chunk_size', passes: 'passes' };
+topic_viewer_api_fields = { name: 'source_collection', from: 'source_address', output: 'output' };
+entity_recognition_api_fields = { name: 'source_collection', from: 'source_address', style: 'style' };
+
+
 // api targets
-let node_names = ['Sample_Data', 'Join', 'Import_Collection', 'Tokenization', 'Stopword_Removal', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Graph_Construction', 'Graph_viewer', 'Export_File'];
+let node_names = ['Entity_Recognition', 'Topic_Viewer', 'Topic_Modeling', 'Sample_Data', 'Join', 'Import_Collection', 'Tokenization', 'Stopword_Removal', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Graph_Construction', 'Graph_viewer', 'Export_File'];
 
 let import_targets = ['Tokenization', 'Join'];
 let sample_data_targets = ['Tokenization', 'Join'];
 let tokenization_targets = node_names.filter(x => !['Tokenization', 'Graph_Viewer'].includes(x));
-let stemming_targets = ['Join', 'Stopword_Removal', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
-let lemmatizing_targets = ['Join', 'Stopword_Removal', 'Stemming', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
-let stop_word_removal_targets = ['Join', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let stemming_targets = ['Entity_Recognition', 'Topic_Modeling', 'Join', 'Stopword_Removal', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let lemmatizing_targets = ['Entity_Recognition', 'Topic_Modeling', 'Join', 'Stopword_Removal', 'Stemming', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
+let stop_word_removal_targets = ['Entity_Recognition', 'Topic_Modeling', 'Join', 'Stemming', 'Lemmatizing', 'Doc_Statistics', 'TF_IDF', 'Export_File', 'Graph_Construction'];
 let doc_statistics_targets = ['Join', 'Export_File'];
 let tf_idf_targets = ['Join', 'Export_File'];
 let graph_construction_targets = ['Join', 'Export_File', 'Graph_Viewer'];
+let topic_modeling_targets = ['Join', 'Export_File', 'Topic_Viewer'];
+let entity_recognition_targets = ['Join', 'Export_File'];
 
 // api object
 let import_collection_api = { name: 'import_collection', targets: import_targets, url: 'api/import/', fields: import_collection_api_fields }
@@ -101,6 +108,9 @@ let tf_idf_api = { name: 'tf_idf', targets: tf_idf_targets, url: 'api/tf-idf/', 
 let graph_construction_api = { name: 'graph_construction', targets: graph_construction_targets, url: 'api/graph-construction/', fields: graph_construction_api_fields }
 let graph_viewer_api = { name: 'graph_viewr', url: 'api/graph-viewer/', fields: graph_construction_api_fields }
 let join_api = { name: 'name', url: 'api/join/', fields: join_api_fields }
+let topic_modeling_api = { name: 'name', url: 'api/topic-modeling/', fields: topic_modeling_api_fields }
+let topic_viewer_api = { name: 'name', url: 'api/topic-viewer/', fields: topic_viewer_api_fields }
+let entity_recognition_api = { name: 'name', url: 'api/entity-recognition/', fields: entity_recognition_api_fields }
     // api arrays
 const APIs = {
     import_collection: import_collection_api,
@@ -114,7 +124,10 @@ const APIs = {
     graph_viewer: graph_viewer_api,
     lemmatizing: lemmatizing_api,
     join: join_api,
-    sample_data: sample_data_api
+    sample_data: sample_data_api,
+    topic_modeling: topic_modeling_api,
+    topic_viewer: topic_viewer_api,
+    entity_recognition: entity_recognition_api
 
 }
 
@@ -263,6 +276,12 @@ function make_formData(form_id, fields) {
 
 /* ----------------------- */
 
+drop_down_fields = ['language', 'algorithm', 'seperator', 'output_format', 'graph_type',
+    'min_sim', 'node_shape', 'node_size', 'method', 'output', 'style',
+    'input_collection', 'alpha', 'output'
+]
+meta_data_fields = ['source_collection', 'source_node', 'source_id', 'source_address', 'current_address', 'state', ]
+join_fields = ['name1', 'name2', 'from_path1', 'from_path2', 'node_color', 'num_topics', 'chunk_size', 'passes']
 
 // functio for getting specific data form node parameters or node meta data
 function get_node_info_field(form_id, field) {
@@ -271,102 +290,22 @@ function get_node_info_field(form_id, field) {
     let form_selector = 'form#'.concat(form_id);
     let p_selector = '';
 
-    if (field == 'file_name') {
+    if (meta_data_fields.includes(field)) {
+        p_selector = ' .meta-data p.' + field;
+        field_selector = form_selector + p_selector;
+        field_value = $(field_selector).text()
 
-        p_selector = ' .meta-data p.source_collection';
-
-    } else if (field == 'input_collection') {
-
-        field_selector = form_selector + ' select#input_collection';
+    } else if (drop_down_fields.includes(field)) {
+        field_selector = form_selector + ' select#' + field;
         field_value = $(field_selector).find(":selected").val();
-        return field_value;
 
-    } else if (field == 'language') {
-
-        field_selector = form_selector + ' select#language';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'algorithm') {
-
-        field_selector = form_selector + ' select#algorithm';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'seperator') {
-
-        field_selector = form_selector + ' select#seperator';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'output_format') {
-
-        field_selector = form_selector + ' select#output_format';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'graph_type') {
-
-        field_selector = form_selector + ' select#graph_type';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'min_sim') {
-
-        field_selector = form_selector + ' select#min_sim';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'node_shape') {
-
-        field_selector = form_selector + ' select#node_shape';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'node_size') {
-
-        field_selector = form_selector + ' select#node_size';
-        field_value = $(field_selector).find(":selected").val();
-        return field_value;
-
-    } else if (field == 'source_node') {
-        p_selector = ' .meta-data p.source_node';
-
-    } else if (field == 'source_id') {
-        p_selector = ' .meta-data p.source_id';
-
-    } else if (field == 'source_address') {
-        p_selector = ' .meta-data p.source_address';
-
-    } else if (field == 'current_address') {
-        p_selector = ' .meta-data p.current_address';
-    } else if (field == 'name1') {
-        p_selector = ' input#name1';
+    } else if (join_fields.includes(field)) {
+        p_selector = ' input#' + field;
         field_selector = form_selector + p_selector;
         field_value = $(field_selector).val()
-        return field_value;
-    } else if (field == 'name2') {
-        p_selector = ' input#name2';
-        field_selector = form_selector + p_selector;
-        field_value = $(field_selector).val()
-        return field_value;
-    } else if (field == 'from_path1') {
-        p_selector = ' input#from_path1';
-        field_selector = form_selector + p_selector;
-        field_value = $(field_selector).val()
-        return field_value;
-    } else if (field == 'from_path2') {
-        p_selector = ' input#from_path2';
-        field_selector = form_selector + p_selector;
-        field_value = $(field_selector).val()
-        return field_value;
-    } else if (field == 'state') {
-        p_selector = ' .meta-data p.state';
     }
-
-    field_selector = form_selector + p_selector;
-    field_value = $(field_selector).text()
     return field_value;
+
 }
 
 
@@ -419,9 +358,9 @@ function get_input_params(current_node_id) {
         if (s.target.id == current_node_id) {
             source_nodes.push(s.source.id);
             let form_id = s.source.id;
-            let file_name = get_node_info_field(form_id, 'file_name');
+            let source_collection = get_node_info_field(form_id, 'source_collection');
             let from_path = get_node_info_field(form_id, 'current_address');
-            input_param.push({ 'form_id': form_id, 'name': file_name, 'from_path': from_path });
+            input_param.push({ 'form_id': form_id, 'name': source_collection, 'from_path': from_path });
 
         }
     });
@@ -434,7 +373,7 @@ function update_connected_node(form_id) {
     source_id = form_id;
     source_node = source_id.split('-')[0];
     source_unique_id = source_id.replace(source_node + '-', '');
-    source_collection = get_node_info_field(form_id, 'file_name');
+    source_collection = get_node_info_field(form_id, 'source_collection');
     source_cc_address = get_node_info_field(form_id, 'current_address');
 
     $.each(target_nodes, function(index, value) {
@@ -451,6 +390,64 @@ function update_connected_node(form_id) {
 
 }
 
+
+function update_table_data(res, form_class, form_id) {
+    table_selector = 'table#'.concat(form_id) + ' tbody';
+    $(table_selector).children().remove();
+    $.each(res, function(index, value) {
+        if (index > 0) {
+            if (form_class == 'import_collection' || form_class == 'join' || form_class == 'sample_data') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.name + '</td>' + '<td class="col-4">' + value.text + '</td>' + '<td class="col-3">' + String(Math.round(Number(value.size) / 1000)) + '</td>' + '</tr>');
+
+            } else if (form_class == 'tokenization') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.tokens + '</td>' + '<td class="col-2">' + value.tokens_count + '</td>' + '</tr>');
+
+            } else if (form_class == 'stopword_removal') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_10_removed_words + '</td>' + '<td class="col-2">' + value.removed_count + '</td>' + '</tr>');
+
+            } else if (form_class == 'doc_statistics') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-2">' + value.distinct + '</td>' + '<td class="col-2">' + value.stop + '</td>' + '<td class="col-2">' + value.main + '</td>' + '</tr>');
+                // $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-6">' + value.frequent + '</td>'  + '</tr>');
+
+            } else if (form_class == 'lemmatizing') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_lemmatized + '</td>' + '<td class="col-2">' + value.lemmatized_count + '</td>' + '</tr>');
+
+            } else if (form_class == 'stemming') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
+
+            } else if (form_class == 'graph_construction') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.source + '</td>' + '<td class="col-6">' + value.target + '</td>' + '<td class="col-2">' + value.sim + '</td>' + '</tr>');
+
+            } else if (form_class == 'tf_idf') {
+
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.term + '</td>' + '<td class="col-4">' + value.doc + '</td>' + '<td class="col-2">' + value.weight + '</td>' + '</tr>');
+
+            } else if (form_class == 'graph_viewer') {
+
+            } else if (form_class == 'topic_modeling') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-11">' + value.topic + '</td>' + '</tr>');
+
+            } else if (form_class == 'topic_viewer') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-11">' + value.topic + '</td>' + '</tr>');
+
+            } else if (form_class == 'entity_recognition') {
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.entites + '</td>' + '<td class="col-4">' + value.link + '</td>' + '</tr>');
+
+            }
+        } else {
+            current_address = value.file_name;
+            if (typeof(value.output_path) != 'undefined') {
+                current_address = value.output_path;
+            }
+            // if (form_class == 'import_collection') {
+            //     current_address = value.file_name;
+            // }
+            update_meta_data(form_selector, value.file_name, 'default', 'default', 'default', current_address, 'default', '');
+        }
+
+    });
+}
+
 // send ajax request to api
 function send_request(formData, url, form_id, form_class) {
     form_selector = 'form#'.concat(form_id);
@@ -465,59 +462,23 @@ function send_request(formData, url, form_id, form_class) {
 
 
     }).done(function(res) {
-        table_selector = 'table#'.concat(form_id) + ' tbody';
-        $(table_selector).children().remove();
-        $.each(res, function(index, value) {
-            if (index > 0) {
-                if (form_class == 'import_collection' || form_class == 'join' || form_class == 'sample_data') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.name + '</td>' + '<td class="col-4">' + value.text + '</td>' + '<td class="col-3">' + String(Math.round(Number(value.size) / 1000)) + '</td>' + '</tr>');
 
-                } else if (form_class == 'tokenization') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.tokens + '</td>' + '<td class="col-2">' + value.tokens_count + '</td>' + '</tr>');
-
-                } else if (form_class == 'stopword_removal') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_10_removed_words + '</td>' + '<td class="col-2">' + value.removed_count + '</td>' + '</tr>');
-
-                } else if (form_class == 'doc_statistics') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-2">' + value.distinct + '</td>' + '<td class="col-2">' + value.stop + '</td>' + '<td class="col-2">' + value.main + '</td>' + '</tr>');
-                    // $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-2">' + value.total + '</td>' + '<td class="col-6">' + value.frequent + '</td>'  + '</tr>');
-
-                } else if (form_class == 'lemmatizing') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_lemmatized + '</td>' + '<td class="col-2">' + value.lemmatized_count + '</td>' + '</tr>');
-
-                } else if (form_class == 'stemming') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
-
-                } else if (form_class == 'graph_construction') {
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.source + '</td>' + '<td class="col-6">' + value.target + '</td>' + '<td class="col-2">' + value.sim + '</td>' + '</tr>');
-
-                } else if (form_class == 'tf_idf') {
-
-                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.term + '</td>' + '<td class="col-4">' + value.doc + '</td>' + '<td class="col-2">' + value.weight + '</td>' + '</tr>');
-
-                } else if (form_class == 'graph_viewer') {
-
-                }
-            } else {
-                current_address = value.file_name;
-                if (typeof(value.output_path) != 'undefined') {
-                    current_address = value.output_path;
-                }
-                // if (form_class == 'import_collection') {
-                //     current_address = value.file_name;
-                // }
-                update_meta_data(form_selector, value.file_name, 'default', 'default', 'default', current_address, 'default', '');
-            }
-
-        });
-
-        update_controll_color(form_id, StateColor.Completed);
+        update_table_data(res, form_class, form_id)
         update_meta_data(form_selector, 'default', 'default', 'default', 'default', current_address, StateColor.Completed, '');
         update_connected_node(form_id);
+        setTimeout(function() {
+            update_controll_color(form_id, StateColor.Completed);
+        }, 500);
 
+        if (form_class == 'topic_viewer') {
+            alert(res);
+
+        }
 
     }).fail(function(res) {
-        update_controll_color(form_id, StateColor.Failed);
+        setTimeout(function() {
+            update_controll_color(form_id, StateColor.Failed);
+        }, 500);
         update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
 
     });
@@ -597,7 +558,7 @@ function basic_running(form_id, form_class) {
 }
 
 function get_form_class(form_id) {
-    class_names = ['sample_data', 'join', 'import_collection', 'tokenization', 'stopword_removal', 'stemming', 'lemmatizing', 'doc_statistics', 'tf_idf', 'graph_construction', 'graph_viewer', 'export_file'];
+    class_names = ['entity_recognition', 'topic_viewer', 'topic_modeling', 'sample_data', 'join', 'import_collection', 'tokenization', 'stopword_removal', 'stemming', 'lemmatizing', 'doc_statistics', 'tf_idf', 'graph_construction', 'graph_viewer', 'export_file'];
     form_selector = 'form#' + form_id;
     class_name = ''
     $.each(class_names, function(index, value) {
@@ -618,7 +579,7 @@ instance.bind("connection", function(info) {
     source_unique_id = source_id.replace(source_node + '-', '');
     source_form_selector = 'form#'.concat(source_id);;
 
-    source_collection = get_node_info_field(source_id, 'file_name');
+    source_collection = get_node_info_field(source_id, 'source_collection');
 
     source_state = get_node_info_field(source_id, 'state');
     current_address = get_node_info_field(source_id, 'current_address');
@@ -627,7 +588,6 @@ instance.bind("connection", function(info) {
     target_id = info.target.id;
     target_node = target_id.split('-')[0];
     target_form_selector = 'form#'.concat(target_id);
-
 
 
 
@@ -867,7 +827,7 @@ instance.bind("ready", function() {
                     maxConnections: 10
                 });
 
-            } else if (draggable_element_id.includes('Export') || draggable_element_id.includes('Graph_Viewer')) {
+            } else if (draggable_element_id.includes('Export') || draggable_element_id.includes('Graph_Viewer') || draggable_element_id.includes('Topic_Viewer')) {
                 instance.addEndpoint(node_id, {
                     endpoint: "Dot",
                     anchor: ["LeftMiddle"],
@@ -963,11 +923,11 @@ instance.bind("ready", function() {
 
 
     function correct_address_node_names(address) {
-        return address.replace('media/result/', '').replace('stop_word', 'stopword_removed').replace('/', '_').concat('_output');
+        return address.replace('media/', '').replace('/raw_text', '').replace('result', '').replace('stop_word', 'stopword_removed').replace('/', '_').concat('_output');
     }
 
     function download_file(url, form_id, sequence_address) {
-        file_name = get_node_info_field(form_id, 'file_name');
+        file_name = get_node_info_field(form_id, 'source_collection');
         source_node = get_node_info_field(form_id, 'source_node');
         form_selector = 'form#'.concat(form_id);
         file_name_wo_extention = file_name.split('.').slice(0, -1).join('.')
@@ -1013,13 +973,65 @@ instance.bind("ready", function() {
         form_id = $(this).closest('form').attr('id');
         form_class = get_form_class(form_id);
         // alert(form_class);
-        temp = ['export_file', 'import_collection', 'graph_viewer'];
+        temp = ['export_file', 'import_collection', 'graph_viewer', 'topic_viewer'];
+
+
+        update_controll_color(form_id, StateColor.Running);
+
 
         if (!temp.includes(form_class)) {
 
             basic_running(form_id, form_class);
 
             // import collection running
+
+        } else if (form_class == 'topic_viewer') {
+            file_name = get_node_info_field(form_id, 'source_collection');
+            source_node = get_node_info_field(form_id, 'source_node');
+            form_selector = 'form#'.concat(form_id);
+            source_address = get_node_info_field(form_id, 'source_address');
+            url = host + source_address + '/lda.html'
+            current_state = get_node_info_field(form_id, 'state');
+            if (current_state != 'Created') {
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    xhrFields: {
+                        responseType: 'blob',
+
+                    },
+                    success: function(data) {
+
+                        var a = document.createElement('a');
+                        // var url = window.URL.createObjectURL(data);
+                        a.href = url;
+                        a.target = 'blank';
+                        a.download = 'lda.html';
+                        document.body.append(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                        update_controll_color(form_id, StateColor.Completed);
+                        update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Completed, '');
+                    }
+
+                }).fail(function(res) {
+                    update_controll_color(form_id, StateColor.Failed);
+                    update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
+
+
+                });
+            } else {
+                source_id = get_source_node(form_id);
+                button_selector = 'form#' + source_id + ' button';
+                $(button_selector).click();
+                if (get_node_info_field(source_id, 'state') == 'Completed') {
+
+                    let form_selector = 'form#' + form_id + ' button';
+                    $(form_selector).click();
+                }
+            }
+
         } else if (form_class == 'import_collection') {
 
 
@@ -1095,6 +1107,7 @@ instance.bind("ready", function() {
                     processData: false,
                 }).done(function(res) {
                     file_src = host + res;
+                    alert('file_res=' + file_src);
                     download_file(file_src, form_id, source_address);
 
                 }).fail(function(res) {
@@ -1120,7 +1133,7 @@ instance.bind("ready", function() {
                 form_class = 'graph_viewer';
                 form_selector = 'form#'.concat(form_id);
                 source_address = get_node_info_field(form_id, 'source_address');
-                source_collection = get_node_info_field(form_id, 'file_name');
+                source_collection = get_node_info_field(form_id, 'source_collection');
 
 
                 fields = APIs[form_class].fields;
@@ -1153,6 +1166,7 @@ instance.bind("ready", function() {
                         min_sim = get_node_info_field(source_form_id, 'min_sim')
                         shape = get_node_info_field(form_id, 'node_shape');
                         size = parseInt(get_node_info_field(form_id, 'node_size'));
+                        node_color = get_node_info_field(form_id, 'node_color');
                         // set the chart title
                         chart.title("Minimum Similarity: " + min_sim);
 
@@ -1165,10 +1179,27 @@ instance.bind("ready", function() {
                         nodes.normal().height(size);
                         nodes.hovered().height(size + 10);
                         nodes.selected().height(size + 10);
+
+
+
+
+                        // set the fill of nodes
+                        nodes.normal().fill(node_color);
+                        nodes.hovered().fill(node_color);
+                        nodes.selected().fill('white');
+
+                        // set the stroke of nodes
+                        nodes.normal().stroke(null);
+                        nodes.hovered().stroke(node_color, 3);
+                        nodes.selected().stroke(node_color, 3);
+
+                        chart.id('graph_chart');
+
                         // initiate drawing the chart
                         chart.draw();
                     });
                     $('#modal-button').click();
+                    document.addEventListener('contextmenu', event => event.preventDefault());
 
                     update_controll_color(form_id, StateColor.Completed);
                     update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Completed, '');
