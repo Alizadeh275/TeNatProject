@@ -100,6 +100,7 @@
                     </div>
                     <div class="modal-body" id="snapshot">
                         <div id="graph-container" class="w-100 h-100 p-1 border">
+
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -1410,28 +1411,28 @@
                             <label for="formGroupExampleInput2" class="mb-1 mt-2">Method:</label>
                             <select id="method" class="form-control pl-0 mt-0">
                                 <option value="LDA" selected>LDA</option>
-                                <option value="LSI">LSI</option>
+                                <!-- <option value="LSI">LSI</option>
                                 <option value="LSI">HDP</option>
-                                <option value="LSI">Rp</option>
+                                <option value="LSI">Rp</option> -->
                             </select>
 
                             <label for="num_topics" class="mb-1 mt-2">Num_Topics:</label>
                             <input class="form-control" type="number" value="5" id="num_topics" min="1" max="999" keyboard="false">
 
-                            <!-- <label for="formGroupExampleInput2" class="mb-1 mt-2">Alpha:</label>
-                            <select id="method" class="form-control pl-0 mt-0">
-                                <option value="Jaccard" selected>symmetric</option>
-                                <option value="LSI">asymmetric</option>
-                                <option value="LSI">auto</option>
-                            </select> -->
-                            <!-- 
+                            <label for="formGroupExampleInput2" class="mb-1 mt-2">Alpha:</label>
+                            <select id="alpha" class="form-control pl-0 mt-0">
+                                <option value="symmetric" selected>symmetric</option>
+                                <option value="asymmetric">asymmetric</option>
+                                <option value="auto">auto</option>
+                            </select>
+
 
 
                             <label for="chunk_size" class="mb-1 mt-2">Chunk_Size:</label>
-                            <input class="form-control" type="number" value="2000" id="chunk_size" min="1" max="9999" keyboard="false"> -->
-                            <!-- 
+                            <input class="form-control" type="number" value="2000" id="chunk_size" min="1" max="9999" keyboard="false">
+
                             <label for="passes" class="mb-1 mt-2">Passes:</label>
-                            <input class="form-control" type="number" value="1" id="passes" min="1" max="20" keyboard="false"> -->
+                            <input class="form-control" type="number" value="1" id="passes" min="1" max="20" keyboard="false">
 
                         </div>
                         <div class="p-1 w-100 text-light bg-info">Node Meta Data</div>
@@ -1569,7 +1570,7 @@
 
                     <!-- Topic_Viewer -->
 
-                    <form class="my-form-control d-none w-100 graph_viewer" id="Topic_Viewer">
+                    <form class="my-form-control d-none w-100 topic_viewer" id="Topic_Viewer">
                         <div id="Info_segment" class="bg-light w-100 p-0 m-0" style="position: sticky; top: 0; z-index: 4;">
                             <p class="text-secondary bg-light font-weight-bolder w-100 m-0 p-1" style="font-size: 12px;">Info</p>
                             <h3 class="bg-light w-100 m-0 p-2">Topic Viewer</h3>
@@ -1633,10 +1634,10 @@
                                 <label class="text-secondary w-100">Tip:</label>
                                 <p class=" mb-1 tip"></p>
                             </div>
-                            <div class="row mt-1 border-bottom px-1 d-none">
+                            <!-- <div class="row mt-1 border-bottom px-1 d-none">
                                 <label class="text-secondary w-100">data:</label>
                                 <p id="graph_data" class=" mb-1 graph_data"></p>
-                            </div>
+                            </div> -->
 
 
                         </div>
