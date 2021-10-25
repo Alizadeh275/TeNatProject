@@ -108,9 +108,9 @@ let tf_idf_api = { name: 'tf_idf', targets: tf_idf_targets, url: 'api/tf-idf/', 
 let graph_construction_api = { name: 'graph_construction', targets: graph_construction_targets, url: 'api/graph-construction/', fields: graph_construction_api_fields }
 let graph_viewer_api = { name: 'graph_viewr', url: 'api/graph-viewer/', fields: graph_construction_api_fields }
 let join_api = { name: 'name', url: 'api/join/', fields: join_api_fields }
-let topic_modeling_api = { name: 'name', url: 'api/topic-modeling/', fields: topic_modeling_api_fields }
+let topic_modeling_api = { name: 'name', targets: topic_modeling_targets, url: 'api/topic-modeling/', fields: topic_modeling_api_fields }
 let topic_viewer_api = { name: 'name', url: 'api/topic-viewer/', fields: topic_viewer_api_fields }
-let entity_recognition_api = { name: 'name', url: 'api/entity-recognition/', fields: entity_recognition_api_fields }
+let entity_recognition_api = { name: 'name', targets: entity_recognition_targets, url: 'api/entity-recognition/', fields: entity_recognition_api_fields }
     // api arrays
 const APIs = {
     import_collection: import_collection_api,
@@ -630,6 +630,7 @@ instance.bind("connection", function(info) {
             // outlineStroke: 'yellow',
             dashstyle: '0'
         });
+        instance.repaint(info.connection);
         //  var endpoints = instance.getEndpoints(target_id);
         //  endpoint = endpoints[0];
         //  endpoint.connectionType = 'green-connection';
