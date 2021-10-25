@@ -622,6 +622,14 @@ instance.bind("connection", function(info) {
             instance.deleteConnection(info.connection);
         }, 250);
     } else {
+        info.connection.setPaintStyle({
+            stroke: "gray",
+            strokeWidth: 2,
+            // reattach: true,
+            // outlineWidth: 0.5,
+            // outlineStroke: 'yellow',
+            dashstyle: '0'
+        });
         //  var endpoints = instance.getEndpoints(target_id);
         //  endpoint = endpoints[0];
         //  endpoint.connectionType = 'green-connection';
@@ -671,11 +679,13 @@ instance.bind("ready", function() {
                 // reattach: true,
                 // outlineWidth: 0.5,
                 // outlineStroke: 'yellow',
-                // dashstyle: '2 1'
+                dashstyle: '2 1'
             },
             hoverPaintStyle: {
                 stroke: "gray",
-                strokeWidth: 8
+                strokeWidth: 8,
+                dashstyle: '0'
+
             },
             connector: "Bezier"
         },
