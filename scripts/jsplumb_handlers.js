@@ -24,8 +24,8 @@ The actions divide into two category:
 
 /*----------------------  Variables  ------------------------- */
 
-var host = 'http://localhost:8000/';
-// var host = 'https://tenat.pythonanywhere.com/';
+// var host = 'http://localhost:8000/';
+var host = 'https://tenat.pythonanywhere.com/';
 // var host = ':8020';
 var instance = jsPlumb.getInstance({});
 let grapn_viewer_data = {}
@@ -67,13 +67,13 @@ stemming_api_fields = { name: 'source_collection', from: 'source_address', langu
 lemmatizing_api_fields = { name: 'source_collection', from: 'source_address', language: 'language' };
 export_file_api_fields = { name: 'source_collection', from: 'source_address', output_format: 'output_format' };
 tf_idf_api_fields = { name: 'source_collection', from: 'source_address', method: 'algorithm' };
-graph_construction_api_fields = { name: 'source_collection', from: 'source_address', type: 'graph_tpye', min_sim: 'min_sim' };
+graph_construction_api_fields = { name: 'source_collection', from: 'source_address', level: 'level', type: 'graph_tpye', min_sim: 'min_sim' };
 graph_viewer_api_fields = { name: 'source_collection', from: 'source_address' };
 join_api_fields = { from1: 'from_path1', from2: 'from_path2', name1: 'name1', name2: 'name2' };
 
 topic_modeling_api_fields = { name: 'source_collection', from: 'source_address', method: 'method', num_topics: 'num_topics', alpha: 'alpha', chunk_size: 'chunk_size', passes: 'passes' };
 topic_viewer_api_fields = { name: 'source_collection', from: 'source_address', output: 'output' };
-entity_recognition_api_fields = { name: 'source_collection', from: 'source_address', style: 'style' };
+entity_recognition_api_fields = { name: 'source_collection', from: 'source_address', language: 'language' };
 
 
 // api targets
@@ -279,7 +279,7 @@ function make_formData(form_id, fields) {
 
 drop_down_fields = ['language', 'algorithm', 'seperator', 'output_format', 'graph_type',
     'min_sim', 'node_shape', 'node_size', 'method', 'output', 'style',
-    'input_collection', 'alpha', 'output'
+    'input_collection', 'alpha', 'output', 'level'
 ]
 meta_data_fields = ['source_collection', 'source_node', 'source_id', 'source_address', 'current_address', 'state', ]
 join_fields = ['name1', 'name2', 'from_path1', 'from_path2', 'node_color', 'num_topics', 'chunk_size', 'passes']
@@ -437,7 +437,12 @@ function update_table_data(res, form_class, form_id) {
                 $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.doc_name + '</td>' + '<td class="col-6">' + value.top_stemmed + '</td>' + '<td class="col-2">' + value.stemmed_count + '</td>' + '</tr>');
 
             } else if (form_class == 'graph_construction') {
-                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.source + '</td>' + '<td class="col-6">' + value.target + '</td>' + '<td class="col-2">' + value.sim + '</td>' + '</tr>');
+                if (get_graph_level(form_id) == 'document') {
+                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-3">' + value.source + '</td>' + '<td class="col-6">' + value.target + '</td>' + '<td class="col-2">' + value.sim + '</td>' + '</tr>');
+
+                } else {
+                    $(table_selector).append('<tr>' + '<th scope = "row" class="col-2">' + index + '</th>' + '<td class="col-8 doc_name">' + value.doc_name + '</td>' + '<td class="col-2">' + '<i onclick="show_graph(event)" class="bi bi-image text-info sentence_graph_icon"></i>' + '<span class="d-none">' + value.graph_data_address + '</span>' + '</tr>');
+                }
 
             } else if (form_class == 'tf_idf') {
 
@@ -452,7 +457,7 @@ function update_table_data(res, form_class, form_id) {
                 $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-11">' + value.topic + '</td>' + '</tr>');
 
             } else if (form_class == 'entity_recognition') {
-                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td class="col-4">' + value.entites + '</td>' + '<td class="col-4">' + value.link + '</td>' + '</tr>');
+                $(table_selector).append('<tr>' + '<th scope = "row" class="col-1">' + index + '</th>' + '<td id="doc_name" class="col-2">' + value.doc_name + '</td>' + '<td class="col-10">' + value.entities + '</td>' + '<td class="col-2">' + value.entity_count + '</td>' + '<td class="col-1">' + '<a target="blank" href="' + host + value.image_address + '"> <i  class="bi bi-image text-info sentence_graph_icon"></i> </a>' + '</td>' + '</tr>');
 
             }
         } else {
@@ -491,10 +496,7 @@ function send_request(formData, url, form_id, form_class) {
             update_controll_color(form_id, StateColor.Completed);
         }, 500);
 
-        if (form_class == 'topic_viewer') {
-            alert(res);
 
-        }
 
     }).fail(function(res) {
         setTimeout(function() {
@@ -998,6 +1000,66 @@ instance.bind("ready", function() {
     }
 
 
+    $('table i.sentence_graph_icon').click(function() {
+
+        alert('yesss');
+
+        form_class = 'graph_viewer';
+        form_selector = 'form#'.concat(form_id);
+        source_address = get_node_info_field(form_id, 'source_address');
+        source_collection = get_node_info_field(form_id, 'source_collection');
+
+        url = host + APIs[form_class].url;
+
+        let formData = new FormData();
+        formData.append('from', graph_address);
+
+        // alert($('#FilUploader')[0].files[0]);
+        $.ajax({
+            //  url: "https://localhost:8000/api/export/",
+            url: host + graph_viewer_api.url,
+            data: formData,
+            type: 'POST',
+            contentType: false,
+            processData: false,
+        }).done(function(res) {
+
+            anychart.onDocumentReady(function() {
+                // alert('data');
+                $('#graph-container').empty();
+                // create data
+                var data = res;
+                // create a chart and set the data
+                // alert(data.nodes[0]);
+                var chart = anychart.graph(data);
+
+                // prevent zooming the chart with the mouse wheel
+                chart.interactivity().zoomOnMouseWheel(true);
+
+                source_form_id = 'Graph_Construction-' + get_node_info_field(form_id, 'source_id');
+                shape = get_node_info_field(form_id, 'node_shape');
+                size = parseInt(get_node_info_field(form_id, 'node_size'));
+                node_color = get_node_info_field(form_id, 'node_color');
+                // set the chart title
+                // chart.title("Minimum Similarity: " + min_sim);
+
+                // set the container id
+                chart.container("graph-container");
+                var nodes = chart.nodes();
+
+
+                // initiate drawing the chart
+                chart.draw();
+            });
+            $('#modal-button').click();
+            source_address = get_node_info_field(form_id, 'source_address');
+            $('#exampleModalLabel').text(source_collection);
+        }).fail(function(res) {
+
+        });
+
+
+    });
 
 
     $('form button').click(function() {
@@ -1172,6 +1234,7 @@ instance.bind("ready", function() {
                 url = host + APIs[form_class].url;
                 formData = make_formData(form_id, fields);
 
+
                 // alert($('#FilUploader')[0].files[0]);
                 $.ajax({
                     //  url: "https://localhost:8000/api/export/",
@@ -1238,6 +1301,8 @@ instance.bind("ready", function() {
                     source_address = get_node_info_field(form_id, 'source_address');
                     $('#exampleModalLabel').text(source_collection);
                 }).fail(function(res) {
+                    update_controll_color(form_id, StateColor.Failed);
+                    update_meta_data(form_selector, 'default', 'default', 'default', 'default', 'default', StateColor.Failed, '');
 
                 });
             } else {
