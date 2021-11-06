@@ -24,8 +24,8 @@ The actions divide into two category:
 
 /*----------------------  Variables  ------------------------- */
 
-// var host = 'http://localhost:8000/';
-var host = 'https://tenat.pythonanywhere.com/';
+var host = 'http://localhost:8000/';
+// var host = 'https://tenat.pythonanywhere.com/';
 // var host = ':8020';
 var instance = jsPlumb.getInstance({});
 let grapn_viewer_data = {}
@@ -404,7 +404,7 @@ function update_table_header(form_id, form_class) {
         if (get_graph_level(form_id) == 'document') {
             $(thead_selector).append('<th scope="col">#</th> <th scope="col">Source</th> <th scope="col">Target</th> <th scope="col">Similarity</th>');
         } else {
-            $(thead_selector).append('<th scope="col">#</th> <th scope="col">Document</th> <th scope="col">Sentence Graph</th>');
+            $(thead_selector).append('<th scope="col">#</th> <th scope="col">Document</th> <th scope="col">Term Graph</th>');
         }
     }
 }
